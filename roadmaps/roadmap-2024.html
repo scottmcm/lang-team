@@ -1,0 +1,699 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Roadmap 2024 - The Rust Language Design Team</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item "><a href="../welcome.html"><strong aria-hidden="true">1.</strong> Welcome</a></li><li class="chapter-item "><a href="../how_to.html"><strong aria-hidden="true">2.</strong> How do I...?</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../how_to/nominate.html"><strong aria-hidden="true">2.1.</strong> Nominate an issue</a></li><li class="chapter-item "><a href="../how_to/design_meeting.html"><strong aria-hidden="true">2.2.</strong> Request a design meeting</a></li><li class="chapter-item "><a href="../how_to/propose.html"><strong aria-hidden="true">2.3.</strong> Propose a change to the language</a></li><li class="chapter-item "><a href="../how_to/new_lint.html"><strong aria-hidden="true">2.4.</strong> Propose or extend a new lint?</a></li><li class="chapter-item "><a href="../how_to/experiment.html"><strong aria-hidden="true">2.5.</strong> Add an experimental feature gate</a></li><li class="chapter-item "><a href="../how_to/stabilize.html"><strong aria-hidden="true">2.6.</strong> Stabilize a feature</a></li></ol></li><li class="chapter-item "><a href="../decision_process.html"><strong aria-hidden="true">3.</strong> Decision process and principles</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../decision_process/examples.html"><strong aria-hidden="true">3.1.</strong> Decision process examples</a></li><li class="chapter-item "><a href="../decision_process/reference.html"><strong aria-hidden="true">3.2.</strong> Decision process reference</a></li></ol></li><li class="chapter-item "><a href="../membership.html"><strong aria-hidden="true">4.</strong> Becoming and being a lang-team member</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../leads.html"><strong aria-hidden="true">4.1.</strong> Lang-team leads</a></li></ol></li><li class="chapter-item "><a href="../chat_platform.html"><strong aria-hidden="true">5.</strong> Chat platform</a></li><li class="chapter-item "><a href="../calendar.html"><strong aria-hidden="true">6.</strong> Calendar</a></li><li class="chapter-item "><a href="../meetings.html"><strong aria-hidden="true">7.</strong> Meetings</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../meetings/triage.html"><strong aria-hidden="true">7.1.</strong> Triage meeting</a></li><li class="chapter-item "><a href="../meetings/design.html"><strong aria-hidden="true">7.2.</strong> Planning and design meetings</a></li><li class="chapter-item "><a href="../meetings/backlog-bonanza.html"><strong aria-hidden="true">7.3.</strong> Backlog bonanza</a></li></ol></li><li class="chapter-item "><a href="../frequently-requested-changes.html"><strong aria-hidden="true">8.</strong> Frequently Requested Changes</a></li><li class="chapter-item "><a href="../design_notes.html"><strong aria-hidden="true">9.</strong> Design notes</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../design_notes/int_literal_as_float.html"><strong aria-hidden="true">9.1.</strong> Allowing integer literals like 1 to be inferred to floating point</a></li><li class="chapter-item "><a href="../design_notes/general_coroutines.html"><strong aria-hidden="true">9.2.</strong> Generalizing coroutines</a></li><li class="chapter-item "><a href="../design_notes/fn_type_trait_impls.html"><strong aria-hidden="true">9.3.</strong> Extending the capabilities of compiler-generated function types</a></li><li class="chapter-item "><a href="../design_notes/auto_traits.html"><strong aria-hidden="true">9.4.</strong> Auto traits</a></li><li class="chapter-item "><a href="../design_notes/eager_drop.html"><strong aria-hidden="true">9.5.</strong> Eager drop</a></li><li class="chapter-item "><a href="../design_notes/autoref_ops.html"><strong aria-hidden="true">9.6.</strong> Autoderef and autoref in operators</a></li><li class="chapter-item "><a href="../design_notes/copy_ergonomics.html"><strong aria-hidden="true">9.7.</strong> Copy type ergonomics</a></li></ol></li><li class="chapter-item expanded "><a href="../roadmaps.html"><strong aria-hidden="true">10.</strong> Roadmaps</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../roadmaps/roadmap-2024.html" class="active"><strong aria-hidden="true">10.1.</strong> Roadmap 2024</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">The Rust Language Design Team</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/rust-lang/lang-team" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/rust-lang/lang-team/edit/master/src/roadmaps/roadmap-2024.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="lang-team-roadmap-2024"><a class="header" href="#lang-team-roadmap-2024">Lang Team Roadmap 2024</a></h1>
+<p>Rust 1.0 was released in 2015. Since that time, we've seen Rust grow from a
+small language used for a handful of prominent projects into a mainstay in use
+at virtually every major tech company.</p>
+<p>As we work towards Rust 2024, it's natural to ask what's next for the language.
+This roadmap provides insight into that question by describing what we, as
+members of the lang team with input from other Rust teams, would like to
+prioritize.</p>
+<p>We have two goals with this roadmap:</p>
+<ul>
+<li>to give people a sense for what to expect in Rust over the next few years;</li>
+<li>for those who would like to contribute to Rust, to help provide &quot;starting
+points&quot; for how to get involved, and a sense for what kind of projects we are
+looking for.</li>
+</ul>
+<h2 id="rust-2024-scaling-empowerment"><a class="header" href="#rust-2024-scaling-empowerment">Rust 2024: scaling empowerment</a></h2>
+<p>Rust's goal is to <strong>empower everyone to build reliable and efficient
+software</strong>. Success requires not only designing and implementing a great
+language with great libraries and great tools, but also maintaining a great and
+supportive community.</p>
+<p>Our focus for Rust 2024 is to <strong>scale empowerment</strong> in many different ways. As
+we grow, we face increasing challenges in how we can scale the ways in which we
+empower people to an increasing number of people. This roadmap presents three
+general themes we plan to focus on:</p>
+<ul>
+<li><strong><a href="#theme-flatten-the-learning-curve">Flatten the (learning) curve</a></strong>:
+scaling to new users and new use cases
+<ul>
+<li>Make Rust more accessible to new and existing users alike, and make
+solving hard problems easier.</li>
+</ul>
+</li>
+<li><strong><a href="#theme-help-users-help-each-other">Help Rust's users help each other</a></strong>:
+scaling the ecosystem
+<ul>
+<li>Empower library authors so they can---in turn---empower their users.</li>
+</ul>
+</li>
+<li><strong><a href="#theme-help-the-rust-project-scale">Help the Rust project scale</a></strong>:
+scaling the project
+<ul>
+<li>Develop processes to scale to the needs and use cases of a growing number
+of users; evaluate and finish projects we've started.</li>
+</ul>
+</li>
+</ul>
+<p>For each theme, we'll describe our goals for Rust 2024, and give a few examples
+of the kinds of things that we're working on right now, as well as the kinds of
+things we would like to do over the next few years.</p>
+<p>This roadmap is a starting point. Our intent is to highlight those areas that
+will have the biggest impact on Rust's success. Specific examples will change
+over time, whether because they're finished or because new proposals arise. As
+2023 approaches, we will revisit these themes to see how much progress we have
+made, and whether we wish to adjust the list.</p>
+<h2 id="theme-flatten-the-learning-curve"><a class="header" href="#theme-flatten-the-learning-curve">Theme: Flatten the (learning) curve</a></h2>
+<h3 id="the-vision"><a class="header" href="#the-vision">The vision</a></h3>
+<p>Thanks to a consistent focus on ergonomics, Rust has become considerably easier
+to use over the last few years. Companies building large teams of Rust users
+report that the typical onboarding time for a Rust engineer is around 3-6
+months. Of course, once folks learn Rust, they typically love it. Even so, many
+people report a sense of high &quot;cognitive overhead&quot; in using it, and &quot;learning
+curve&quot; remains the most common reason not to use Rust. The fact is that, even
+after you learn how the Rust borrow checker works, there remain a lot of &quot;small
+details&quot; that you have to get just right to get your Rust program to compile.</p>
+<p>For Rust 2024, we will identify and eliminate many of those patterns and
+idiosyncracies that one must learn to use Rust; our goal is to let you focus
+squarely on the &quot;inherent complexity&quot; of your problem domain and avoid
+&quot;accidental complexity&quot; from Rust as much as possible.</p>
+<p>Async and embedded Rust are areas of particular interest. We have made a lot of
+strides to support those areas, and they are growing rapidly. Nonetheless, Rust
+lacks many core capabilities that would be required to make working in those
+domains not only <em>possible</em> but <em>straightforward and delightful</em>. For Rust
+2024, we will close that gap.</p>
+<p>Our plan for achieving this vision is to focus on four high-level goals (in
+order from broad to precise):</p>
+<ul>
+<li><strong>More precise analyses, less rigamarole:</strong> Make the compiler better able to
+recognize when code is correct via improvements to the borrow checker, type
+inference, and so forth. Identify and eliminate &quot;boilerplate&quot; patterns like
+having to copy-and-paste the same set of where clauses everywhere.</li>
+<li><strong>Express yourself more easily:</strong> Where necessary, extend the language so you
+can express what you want your code to do more directly. In some cases this
+takes the form of syntactic sugar (such as
+<a href="https://github.com/rust-lang/rust/issues/87335">let-else</a>) but in other
+cases it may mean extending the type system to be able to describe new
+patterns (such as <a href="https://rust-lang.github.io/generic-associated-types-initiative/">generic associated
+types</a>).</li>
+<li><strong>Improve async support:</strong> Extend our async-await support beyond the current
+&quot;MVP&quot; to include features like async fns in traits, async drop, and other
+features needed to support the <a href="https://rust-lang.github.io/wg-async/vision/roadmap.html">async vision
+document</a> roadmap.</li>
+<li><strong>Make <code>dyn Trait</code> more usable:</strong> Broaden the set of traits that can be used
+with <code>dyn</code> and make working with <code>dyn</code> closer to working with generics.</li>
+</ul>
+<h3 id="how-you-can-help"><a class="header" href="#how-you-can-help">How you can help</a></h3>
+<p>Join the rust-lang Zulip, and either start a thread in the
+<a href="https://rust-lang.zulipchat.com/#narrow/stream/318377-t-lang.2Froadmap-2024"><code>#t-lang/roadmap-2024</code></a>
+stream, or send a private message to nikomatsakis if you'd like to discuss
+privately first.</p>
+<h3 id="the-plan-so-far"><a class="header" href="#the-plan-so-far">The plan (so far)</a></h3>
+<p>Current active <a href="https://lang-team.rust-lang.org/initiatives.html">initiatives</a>
+in each category include:</p>
+<ul>
+<li><strong>More precise analyses, less rigamarole:</strong>
+<ul>
+<li>Non-lexical lifetimes were a big stride forward, but the <a href="https://github.com/rust-lang/polonius/">polonius
+project</a> promises to improve the
+borrow check's precision even more.</li>
+<li><a href="https://github.com/rust-lang/rust/issues/44491">Implied bounds</a> promise
+to remove a lot of copy-and-pasting of where clauses.</li>
+</ul>
+</li>
+<li><strong>Express yourself more easily:</strong>
+<ul>
+<li><a href="https://github.com/rust-lang/rust/issues/87335">let-else</a> directly
+express the &quot;match this variant or <code>return</code>/<code>continue</code>/etc&quot; pattern.</li>
+<li><a href="https://github.com/rust-lang/rust/issues/53667">let-chains</a> allow you to
+express iterative refinement with a series of pattern-matches and
+conditionals</li>
+<li><a href="https://rust-lang.github.io/impl-trait-initiative/explainer/tait.html">&quot;Type alias&quot; impl
+Trait</a>
+permits APIs to name previously unnameable types. This is part of a
+larger effort to <a href="https://rust-lang.github.io/impl-trait-initiative/">expand impl
+Trait</a>.</li>
+<li><a href="https://rust-lang.github.io/generic-associated-types-initiative/">Generic associated
+types</a>
+allow traits to express a number of patterns (like &quot;iterable&quot;) that the
+current trait system cannot handle. They are a particularly important
+foundational piece for async programming.</li>
+</ul>
+</li>
+<li><strong>Improve async support:</strong>
+<ul>
+<li>We are working to support <a href="https://rust-lang.github.io/async-fundamentals-initiative/explainer/async_fn_in_traits.html">async fns in
+traits</a>,
+including both static dispatch and dyn dispatch.</li>
+</ul>
+</li>
+<li><strong>Make <code>dyn Trait</code> more usable:</strong>
+<ul>
+<li><a href="https://github.com/rust-lang/dyn-upcasting-coercion-initiative/issues/6">Dyn upcasting coercion
+initiative</a>:
+Allow upcasting <code>dyn trait</code> objects from <code>&amp;dyn Subtrait</code> to <code>&amp;dyn Supertrait</code>.</li>
+<li>The <a href="https://rust-lang.github.io/async-fundamentals-initiative/explainer/async_fn_in_traits.html">async fn in
+traits</a>
+initiative is also extending dyn trait to support async fns and &quot;return
+position impl Trait&quot;.</li>
+</ul>
+</li>
+</ul>
+<h3 id="looking-forward"><a class="header" href="#looking-forward">Looking forward</a></h3>
+<p>Looking beyond the initiatives that are in progress, there's a lot of room for
+more improvement. Here are some other ideas we'd like to see. <strong>For many of
+these ideas, the main thing they need is someone to own the design!</strong> If you
+might be interested in giving that a try, come to
+<a href="https://rust-lang.zulipchat.com/#narrow/stream/318377-t-lang.2Froadmap-2024"><code>#t-lang/roadmap-2024</code></a>
+to discuss, or send a private message to nikomatsakis.</p>
+<ul>
+<li><strong>More precise analyses, less rigamarole:</strong>
+<ul>
+<li><a href="https://github.com/rust-lang/lang-team/issues/88">Deref patterns</a>:
+Permit matching types with patterns they can dereference to, such as
+matching a <code>String</code> with a <code>&quot;str&quot;</code>.</li>
+<li>Perfect derive: determine the precise conditions for generic type
+parameters based on the types of a struct fields. For instance,
+<code>#[derive(Clone)] struct MyStruct(Rc&lt;T&gt;)</code> would not require <code>T: Clone</code>,
+because <code>Rc&lt;T&gt;</code> can be cloned without it.</li>
+<li>Autoref, operators, and clones: Generic methods that operate on
+references sometimes necessitate types like <code>&amp;u32</code>; since <code>u32</code> is
+<code>Copy</code>, we could automatically make it a reference. We've historically
+had some hesitance to add more reference-producing operations, because it
+can lead to types the user doesn't expect (such as <code>&amp;&amp;&amp;str</code>). We have
+some ideas to simplify those cases and avoid unnecessary
+double-references.</li>
+</ul>
+</li>
+<li><strong>Express yourself more easily:</strong>
+<ul>
+<li><a href="https://github.com/rust-lang/lang-team/issues/137">Generators</a>, allowing
+users to write iterators (async and otherwise) using custom syntax.</li>
+</ul>
+</li>
+<li><strong>Improve async support:</strong>
+<ul>
+<li>After adding async fn in traits, we intend to add support for async drop,
+async closures, and potentially other features.</li>
+</ul>
+</li>
+<li><strong>Make <code>dyn Trait</code> more usable:</strong>
+<ul>
+<li>Make more patterns &quot;object safe&quot; and thus usable in <code>dyn Trait</code> objects,
+including passing <code>self</code> by value and handling <code>impl Trait</code> in argument
+position (<a href="https://smallcultfollowing.com/babysteps/blog/2022/01/07/dyn-async-traits-part-7/">see this post for more
+information</a>).</li>
+</ul>
+</li>
+</ul>
+<h2 id="theme-help-users-help-each-other"><a class="header" href="#theme-help-users-help-each-other">Theme: Help users help each other</a></h2>
+<h3 id="the-vision-1"><a class="header" href="#the-vision-1">The vision</a></h3>
+<p>Rust's combination of ownership and borrowing, low-level systems control, and
+powerful extensibility mechanisms like procedural macros makes it a great
+language for writing libraries. And, thanks to Cargo, using a library in your
+program only takes a few lines of code. Nonetheless, there are a number of
+things that library authors <em>can't</em> do, or can't do easily -- for example, they
+can't control the error messages you see or deploy an &quot;unstable&quot; feature that
+requires special opt-in to use. For Rust 2024, we want to build features that
+empower library authors to better serve their users, either by helping to
+manage the feature lifecycle or by expanding the capabilities of what a library
+can do.</p>
+<p>We encourage people to experiment and explore in the library ecosystem,
+building new functionality for people to use. Sometimes, that new functionality
+becomes a foundation for others to build on, and standardizing it simplifies
+further development atop it, letting the cycle continue at another level.
+However, some aspects of the Rust language (notably coherence) make it harder
+to extend the Rust standard library or well-established crates from separate
+libraries, discouraging experimentation. Other features (such as aspects of
+method resolution) make it hard to promote best-in-class functionality into the
+standard library or into well-established crates without breaking users of the
+crates that first developed that functionality. For Rust 2024, we want to
+pursue changes that enable more exploration in the ecosystem, and enable stable
+migration of code from the ecosystem into the standard library.</p>
+<p>Our plan for achieving this vision is to focus on four categories of work:</p>
+<ul>
+<li><strong>Feature lifecycle</strong>: Help library authors support features as they move
+from experimental to finalized. Help library authors manage their development
+lifecycle and evolution.</li>
+<li><strong>Richer abstractions</strong>: Extend the language to let library authors express
+richer abstractions.</li>
+<li><strong>Custom developer experience</strong>: Permit library authors can tailor the
+developer experience, for example by tailoring the error messages a user gets
+when traits are not implemented or introducing custom lints.</li>
+<li><strong>Interoperability</strong>: The library ecosystem can easily coordinate, making
+libraries work together without tying them together. Library authors can
+write code that is portable across many environments or specific to one, as
+they please.</li>
+</ul>
+<h3 id="how-you-can-help-1"><a class="header" href="#how-you-can-help-1">How you can help</a></h3>
+<p>Join the rust-lang Zulip, and either start a thread in the
+<a href="https://rust-lang.zulipchat.com/#narrow/stream/318377-t-lang.2Froadmap-2024"><code>#t-lang/roadmap-2024</code></a>
+stream, or send a private message to Josh Triplett if you'd like to discuss
+privately first.</p>
+<h3 id="the-plan-so-far-1"><a class="header" href="#the-plan-so-far-1">The plan (so far)</a></h3>
+<p>Current active <a href="https://lang-team.rust-lang.org/initiatives.html">initiatives</a>
+in each category include:</p>
+<ul>
+<li><strong>Feature lifecycle:</strong>
+<ul>
+<li>RFC 3240 proposes <a href="https://github.com/rust-lang/rfcs/pull/3240">edition-based method
+disambiguation</a>, to support
+moving extension methods from external crates into the standard library.</li>
+</ul>
+</li>
+<li><strong>Richer abstractions:</strong>
+<ul>
+<li>There are numerous core extensions to Rust's type system that permit
+richer traits to be developed. Often the lack of these features prohibits
+people from writing general purpose libraries because they can't get
+sufficient reuse:
+<ul>
+<li><a href="https://rust-lang.github.io/async-fundamentals-initiative/">Async fn in
+traits</a></li>
+<li><a href="https://github.com/rust-lang/lang-team/issues/51">Const generics</a>
+and <a href="https://github.com/rust-lang/lang-team/issues/22">constant
+evaluation</a></li>
+<li><a href="https://rust-lang.github.io/impl-trait-initiative/explainer/tait.html">Type alias impl
+Trait</a></li>
+<li><a href="https://rust-lang.github.io/generic-associated-types-initiative/">Generic associated
+types</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Custom developer experience:</strong>
+<ul>
+<li>We are not currently doing any coordinated initiatives here, though there
+are ongoing efforts that help lay groundwork for this.</li>
+</ul>
+</li>
+<li><strong>Interoperability:</strong>
+<ul>
+<li>Support &quot;global capabilities&quot; like allocators or async runtimes, perhaps
+via an approach like <a href="https://github.com/rust-lang/rfcs/pull/2492">RFC
+2492</a>, and perhaps extending
+to something like <a href="https://tmandry.gitlab.io/blog/posts/2021-12-21-context-capabilities/">scoped contexts and
+capabilities</a>.</li>
+<li><a href="https://rust-lang.github.io/negative-impls-initiative/">Negative impls in
+coherence</a> allows
+for more flexibility in the coherence check by permitting crates to
+explicitly declare that a given type will never implement a given trait.</li>
+<li>The async working group's <a href="https://www.ncameron.org/blog/portable-and-interoperable-async-rust/">portability
+initiative</a>
+(which builds on the work to support <a href="https://rust-lang.github.io/async-fundamentals-initiative/">async fn in
+traits</a>) will
+help the async ecosystem to grow by enabling more interoperability.</li>
+</ul>
+</li>
+</ul>
+<h3 id="looking-forward-1"><a class="header" href="#looking-forward-1">Looking forward</a></h3>
+<p>Looking beyond the initiatives that are in progress, there's a lot of room for
+more improvement. Here are some other ideas we'd like to see. <strong>For many of
+these ideas, the main thing they need is someone to own the design!</strong> If you
+might be interested in giving that a try, come to
+<a href="https://rust-lang.zulipchat.com/#narrow/stream/318377-t-lang.2Froadmap-2024"><code>#t-lang/roadmap-2024</code></a>
+to discuss, or send a private message to Josh Triplett.</p>
+<ul>
+<li><strong>Feature lifecycle</strong>:
+<ul>
+<li>All ecosystem crates can have &quot;release trains&quot;, with the equivalent of
+&quot;nightly features&quot; that require a stability opt-ins. Top-level crates
+retain control over whether any of their dependencies may use nightly
+features.</li>
+</ul>
+</li>
+<li><strong>Richer abstractions</strong>:
+<ul>
+<li>Allow libraries to implement the <code>Fn</code> traits to define callable objects.</li>
+<li>Variadic tuples and variadic generics would address a common pain point
+of &quot;implement this trait for tuples of any arity&quot;.</li>
+</ul>
+</li>
+<li><strong>Custom developer experience</strong>:
+<ul>
+<li>Allow libraries to provide custom lints for their users.</li>
+<li>Allow libraries to control or customize Rust diagnostics, especially for
+trait resolution failures.</li>
+</ul>
+</li>
+<li><strong>Interoperability</strong>:
+<ul>
+<li>Revive the stalled <a href="https://github.com/rust-lang/rfcs/pull/1868">portability
+lint</a> or pursue an
+alternative design (a recent suggestion is that the &quot;platform&quot; might be a
+global service, similar to <a href="https://github.com/rust-lang/rfcs/pull/2492">RFC
+2492</a>, permitting one to use
+where clauses to designate portable code)</li>
+<li>The coherence rules make it hard to implement interoperability traits; we
+should find a way to lift this restriction, while preserving coherence's
+key benefits.</li>
+<li>Adopt a standard way to write performance benchmarks (perhaps simply
+adopt <code>criterion</code> officially).</li>
+<li>Better support for dynamic linking, with richer and safer types than the
+C ABI. For instance, implement an <code>extern &quot;safe&quot;</code> providing a subset of
+Rust's rich types.</li>
+</ul>
+</li>
+</ul>
+<h2 id="theme-help-the-rust-project-scale"><a class="header" href="#theme-help-the-rust-project-scale">Theme: <strong>Help the Rust project scale</strong></a></h2>
+<h3 id="the-vision-2"><a class="header" href="#the-vision-2">The vision</a></h3>
+<p>The Rust repo is a blizzard of activity. This is great, but it can be
+overwhelming, particularly if you are trying to figure out the status of some
+particular thing that you are interested in or would like to contribute to.</p>
+<p>To ship Rust 2024 and make Rust all that it can be, we need a system that makes
+it easy for people to find out what's going on and how they can help. We want
+to scale our language development through delegation, empowering developers to
+own and drive the work that they are passionate about. Lang team liaisons and
+frequent lang team check-in will help ensure quality, stability, and overall
+coherence. The team itself will have a clear &quot;path to membership&quot; that helps us
+to maintain our membership and make sure we have the expertise we need.</p>
+<p>Our plan for achieving this vision is to focus on four categories of work:</p>
+<ul>
+<li><strong>See the status at a glance:</strong> We want it to be easy to identify what things
+the lang-team is actively working on and how far those designs have come. We
+want every tracking issue to clearly identify what &quot;next steps&quot; are needed to
+push that particular feature over the finish line and make sure that those
+steps are clearly documented for would-be contributors.</li>
+<li><strong>Clear owners and clear communication:</strong> Rust operates by consensus, but
+that doesn't mean that everybody has to know all the details of everything.
+We need a system that has clear owners for the work to be done, and ideally,
+owners that are not on the lang team. Simply dividing work though can lead to
+conflicts later on, so we also need frequent communication and updates to
+ensure that everyone is keeping abreast of the overall direction things are
+going, and to surface concerns early.</li>
+<li><strong>Efficient, open processes with tooling support:</strong> We are always looking for
+ways to improve how we operate to help us stay on top of what is going on in
+the Rust project and to reach conclusions more quickly. One thing we've
+noticed is that processes that are supported by bots or other tooling tend to
+work much better.</li>
+</ul>
+<h3 id="how-you-can-help-2"><a class="header" href="#how-you-can-help-2">How you can help</a></h3>
+<p>Join the rust-lang Zulip, and either start a thread in the
+<a href="https://rust-lang.zulipchat.com/#narrow/stream/318377-t-lang.2Froadmap-2024"><code>#t-lang/roadmap-2024</code></a>
+stream, or send a private message to Josh Triplett and nikomatsakis if you'd
+like to discuss privately first.</p>
+<h3 id="the-plan-so-far-2"><a class="header" href="#the-plan-so-far-2">The plan (so far)</a></h3>
+<p>Current active <a href="https://lang-team.rust-lang.org/initiatives.html">initiatives</a>
+in each category include:</p>
+<ul>
+<li><strong>See the status at a glance:</strong>
+<ul>
+<li>The <a href="https://github.com/orgs/rust-lang/projects/16/">initiative project
+board</a> tracks all the
+currently active initiatives that we are focusing on. For each one, it
+shows their <a href="https://lang-team.rust-lang.org/initiatives/process/stages.html">current
+stage</a>
+along with their
+<a href="https://lang-team.rust-lang.org/initiatives/process/roles/owner.html">owners</a>
+and <a href="https://lang-team.rust-lang.org/initiatives/process/roles/liaison.html">lang-team
+liaisons</a>.</li>
+<li>During the <a href="https://lang-team.rust-lang.org/meetings/backlog-bonanza.html">backlog
+bonanza</a>
+meetings, we are going through each older tracking issue and identifying
+what kinds of work is needed to move it forward (needs a summary, needs
+design work, etc).</li>
+<li>We're taking the time to stabilize features that people are using, and
+remove incomplete features as well as features people are not using, with
+the eventual goal of treating everything open as &quot;in-flight&quot; rather than
+&quot;unknown&quot;. We will also reduce the total number of in-flight features.</li>
+</ul>
+</li>
+<li><strong>Clear owners and clear communication:</strong>
+<ul>
+<li>The <a href="https://lang-team.rust-lang.org/initiatives.html">initiative system</a>
+assigns each task an owner, who drives the design, as well as a lang-team
+liaison, who helps ensure alignment with the team. More work is needed to
+get this system up and running smoothly.</li>
+<li>We are launching a <a href="https://hackmd.io/@nikomatsakis/rJ3h_-kJc">formality
+team</a> that will take ownership
+of ensuring Rust's type soundness and diving into the details. This will
+help to grow the set of people with expertise in that area while also
+allowing the main lang team to consult as needed.</li>
+</ul>
+</li>
+<li><strong>Efficient, open processes with tooling support:</strong>
+<ul>
+<li>We have designed a new <a href="https://lang-team.rust-lang.org/decision_process.html">consensus decision
+process</a> that is
+designed to overcome some of the shortcomings we've seen with rfcbot; it
+needs to be implemented. This will help us make easily reversible
+decisions easier, enable more experimentation, make it smoother to raise
+and resolve concerns, and keep track of potential issues from proposal
+through to stabilization</li>
+</ul>
+</li>
+</ul>
+<h3 id="looking-forward-2"><a class="header" href="#looking-forward-2">Looking forward</a></h3>
+<p>Looking beyond the initiatives that are in progress, there's a lot of room for
+more improvement. Here are some other ideas we'd like to see. If you might be
+interested in giving that a try, come to
+<a href="https://rust-lang.zulipchat.com/#narrow/stream/318377-t-lang.2Froadmap-2024"><code>#t-lang/roadmap-2024</code></a>
+to discuss, or send a private message to Josh Triplett and nikomatsakis.</p>
+<ul>
+<li><strong>See the status at a glance:</strong>
+<ul>
+<li>Find ways to integrate the older tracking issues with active initiatives;
+reduce the manual updates required to keep the project board in sync.</li>
+<li>Improve the visualization of projects and blockers to something more
+compelling and easier to follow.</li>
+</ul>
+</li>
+<li><strong>Clear owners and clear communication:</strong>
+<ul>
+<li>Beyond the type system, there are other areas where forming specialized
+teams could be useful.</li>
+</ul>
+</li>
+<li><strong>Efficient, open processes with tooling support:</strong>
+<ul>
+<li>Generally improve rustbot to make meetings more efficient.</li>
+<li>Improve and automate the process of going from initiative proposal to
+tracked initiative.</li>
+</ul>
+</li>
+</ul>
+<h2 id="conclusion"><a class="header" href="#conclusion">Conclusion</a></h2>
+<p>We hope that this post has given you a taste for what we plan to focus on over
+the next few years. If you'd like to help us reach these goals, please <a href="https://rust-lang.zulipchat.com/#narrow/stream/318377-t-lang.2Froadmap-2024">get
+involved</a>!
+We've listed a number of active initiatives for each point, but we've also
+included a lot of ideas that are looking for an owner. Whether you prefer to
+code, design, document, or organize, there's work for you to do. And if the
+only thing you want to do with Rust 2024 is to use it, we welcome that too.
+Happy Rust hacking to y'all!</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../roadmaps.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../roadmaps.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

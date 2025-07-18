@@ -1,0 +1,402 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Frequently Requested Changes - The Rust Language Design Team</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item "><a href="welcome.html"><strong aria-hidden="true">1.</strong> Welcome</a></li><li class="chapter-item "><a href="how_to.html"><strong aria-hidden="true">2.</strong> How do I...?</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="how_to/nominate.html"><strong aria-hidden="true">2.1.</strong> Nominate an issue</a></li><li class="chapter-item "><a href="how_to/design_meeting.html"><strong aria-hidden="true">2.2.</strong> Request a design meeting</a></li><li class="chapter-item "><a href="how_to/propose.html"><strong aria-hidden="true">2.3.</strong> Propose a change to the language</a></li><li class="chapter-item "><a href="how_to/new_lint.html"><strong aria-hidden="true">2.4.</strong> Propose or extend a new lint?</a></li><li class="chapter-item "><a href="how_to/experiment.html"><strong aria-hidden="true">2.5.</strong> Add an experimental feature gate</a></li><li class="chapter-item "><a href="how_to/stabilize.html"><strong aria-hidden="true">2.6.</strong> Stabilize a feature</a></li></ol></li><li class="chapter-item "><a href="decision_process.html"><strong aria-hidden="true">3.</strong> Decision process and principles</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="decision_process/examples.html"><strong aria-hidden="true">3.1.</strong> Decision process examples</a></li><li class="chapter-item "><a href="decision_process/reference.html"><strong aria-hidden="true">3.2.</strong> Decision process reference</a></li></ol></li><li class="chapter-item "><a href="membership.html"><strong aria-hidden="true">4.</strong> Becoming and being a lang-team member</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="leads.html"><strong aria-hidden="true">4.1.</strong> Lang-team leads</a></li></ol></li><li class="chapter-item "><a href="chat_platform.html"><strong aria-hidden="true">5.</strong> Chat platform</a></li><li class="chapter-item "><a href="calendar.html"><strong aria-hidden="true">6.</strong> Calendar</a></li><li class="chapter-item "><a href="meetings.html"><strong aria-hidden="true">7.</strong> Meetings</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="meetings/triage.html"><strong aria-hidden="true">7.1.</strong> Triage meeting</a></li><li class="chapter-item "><a href="meetings/design.html"><strong aria-hidden="true">7.2.</strong> Planning and design meetings</a></li><li class="chapter-item "><a href="meetings/backlog-bonanza.html"><strong aria-hidden="true">7.3.</strong> Backlog bonanza</a></li></ol></li><li class="chapter-item expanded "><a href="frequently-requested-changes.html" class="active"><strong aria-hidden="true">8.</strong> Frequently Requested Changes</a></li><li class="chapter-item "><a href="design_notes.html"><strong aria-hidden="true">9.</strong> Design notes</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="design_notes/int_literal_as_float.html"><strong aria-hidden="true">9.1.</strong> Allowing integer literals like 1 to be inferred to floating point</a></li><li class="chapter-item "><a href="design_notes/general_coroutines.html"><strong aria-hidden="true">9.2.</strong> Generalizing coroutines</a></li><li class="chapter-item "><a href="design_notes/fn_type_trait_impls.html"><strong aria-hidden="true">9.3.</strong> Extending the capabilities of compiler-generated function types</a></li><li class="chapter-item "><a href="design_notes/auto_traits.html"><strong aria-hidden="true">9.4.</strong> Auto traits</a></li><li class="chapter-item "><a href="design_notes/eager_drop.html"><strong aria-hidden="true">9.5.</strong> Eager drop</a></li><li class="chapter-item "><a href="design_notes/autoref_ops.html"><strong aria-hidden="true">9.6.</strong> Autoderef and autoref in operators</a></li><li class="chapter-item "><a href="design_notes/copy_ergonomics.html"><strong aria-hidden="true">9.7.</strong> Copy type ergonomics</a></li></ol></li><li class="chapter-item "><a href="roadmaps.html"><strong aria-hidden="true">10.</strong> Roadmaps</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="roadmaps/roadmap-2024.html"><strong aria-hidden="true">10.1.</strong> Roadmap 2024</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">The Rust Language Design Team</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/rust-lang/lang-team" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/rust-lang/lang-team/edit/master/src/frequently-requested-changes.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="frequently-requested-changes"><a class="header" href="#frequently-requested-changes">Frequently Requested Changes</a></h1>
+<p>Some ideas for language proposals come up quite often. They're attractive ideas
+for one reason or another, but ones that we're unlikely to add.</p>
+<p>This page documents some of those ideas, along with the concerns that argue
+against them.</p>
+<p>If something appears on this page, that doesn't mean Rust would <em>never</em>
+consider making any similar change. It does mean that any hypothetical
+successful proposal to do so would need to address <em>at a minimum</em> all of these
+known concerns, whether by proposing a <em>new and previously unseen</em> approach
+that avoids all the concerns, or by making an <em>extraordinary</em> case for why
+their proposal outweighs those concerns.</p>
+<p>Hopeful proposers of any of these ideas should document their extensive
+research into the many past discussions on these topics and ensure they have
+something new to offer.</p>
+<h2 id="an-operator-for-unwrap"><a class="header" href="#an-operator-for-unwrap">An operator for <code>unwrap</code></a></h2>
+<p>People writing code that makes extensive use of <code>.unwrap()</code> often ask for a
+shorthand operator for it, typically something postfix involving <code>!</code>.</p>
+<p>Rust already provides the <code>?</code> operator for propagating errors. <code>.unwrap()</code>
+exists largely for quick-and-dirty code. We don't want to make it substantially
+easier than it already is to write code using <code>.unwrap()</code>, and we definitely
+don't want to add dedicated syntax for it.</p>
+<h2 id="an-option-to-disable-the-borrow-checker-or-bypass-it-in-unsafe-code"><a class="header" href="#an-option-to-disable-the-borrow-checker-or-bypass-it-in-unsafe-code">An option to disable the borrow checker, or bypass it in <code>unsafe</code> code</a></h2>
+<p>People learning Rust, especially those arriving from other languages, often
+spend time &quot;fighting the borrow checker&quot;. And experienced developers sometimes
+want to write &quot;clever&quot; code that the borrow checker doesn't understand.</p>
+<p>In the course of doing so, some developers request a compiler option to
+&quot;disable the borrow checker&quot;, or a way to bypass the borrow checker in <code>unsafe</code>
+code blocks.</p>
+<p>Rust already provides a means of bypassing the borrow checker: you can write
+<code>unsafe</code> code that uses &quot;raw pointers&quot; (<code>*const T</code> or <code>*mut T</code>, rather than
+<code>&amp;T</code> or <code>&amp;mut T</code>). Using raw pointers, you can manipulate memory in any way you
+see fit, and Rust's borrow checker will do nothing to stop you; if you misuse
+raw pointers, you'll get crashes or incorrect behavior at runtime. Many safe
+Rust data structures and libraries are safe wrappers designed to encapsulate
+some carefully written unsafe code.</p>
+<p>You can also defer borrow checking to runtime, with types like <code>RefCell</code>, <code>Rc</code>,
+and <code>Arc</code>. These types also allow &quot;interior mutability&quot;: modifying a value
+whose type doesn't look modifiable, when the value isn't &quot;semantically&quot; being
+modified. (For instance, managing mutable internal bookkeeping for an otherwise
+immutable value.)</p>
+<p>However, even in an <code>unsafe</code> block, Rust's normal borrowed types (<code>&amp;T</code> and
+<code>&amp;mut T</code>) still follow the same rules they do everywhere else. You can't have
+two mutable references to the same object at once; you can't have a mutable
+reference and an immutable reference at the same time; you can't use an object
+after giving away ownership of it. Having distinct types for safe borrows and
+unsafe raw pointers provides the flexibility of writing unsafe code while still
+getting support from the compiler in places where your code can benefit from
+such support.</p>
+<h2 id="fundamental-changes-to-rust-syntax"><a class="header" href="#fundamental-changes-to-rust-syntax">Fundamental changes to Rust syntax</a></h2>
+<p>This includes proposals such as changing the generic syntax to not use <code>&lt;</code>/<code>&gt;</code>,
+changing block constructs to not require braces, changing function calls to not
+require parentheses, and many other similar proposals. These also include
+proposals to add &quot;alternative&quot; syntaxes, in addition to those that replace the
+existing syntax. Many of these proposals come from people who also write other
+languages. Arguments range from the ergonomic (&quot;I don't want to type this&quot;) to
+the aesthetic (&quot;I don't like how this looks&quot;).</p>
+<p>Changes that would break existing Rust code are non-starters. Even in an
+edition, changes this fundamental remain extremely unlikely. The established
+Rust community with knowledge of existing Rust syntax has a great deal of
+value, and to be considered, a syntax change proposal would have to be not just
+<em>better</em>, but <em>so wildly better</em> as to overcome the massive downside of
+switching.</p>
+<p>In addition, such changes often go against one or more other aspects of Rust's
+design philosophy. For instance, we don't want to make changes that make code
+easier to write but harder to read, or changes that make code more error-prone
+to modify and maintain.</p>
+<p>That said, <em>we are open to proposals that involve new syntax</em>, especially for
+new features, or to improve an existing fundamental feature. The bar for new
+syntax (e.g. new operators) is high, but not insurmountable. But the bar for
+<em>changes to existing syntax</em> is even higher.</p>
+<h2 id="changes-to-avoid-writing-selfmethod-when-calling-a-method-from-a-method"><a class="header" href="#changes-to-avoid-writing-selfmethod-when-calling-a-method-from-a-method">Changes to avoid writing <code>self.method()</code> when calling a method from a method</a></h2>
+<p>In Rust, within a method of an object, calling another method requires writing
+<code>self.othermethod()</code>, and accessing a field requires <code>self.field</code>. In some
+other languages, such accesses can omit the equivalent of <code>self.</code>, and just
+write <code>othermethod</code> or <code>field</code>, implicitly referencing the &quot;current object&quot;.
+People writing code with such method calls or field accesses sometimes ask for
+such shorthand in Rust.</p>
+<p>Rust prefers the explicitness of writing <code>self.</code> for method calls and field
+accesses, and in most ways treating <code>self</code> as a normal object of the type. This
+avoids unexpected calls to the wrong method, makes it easier to distinguish
+methods and free functions, and makes code easier to read. We don't want to
+provide a shorthand that makes this syntax briefer at the expense of this
+clarity and unambiguity.</p>
+<h2 id="arbitrary-custom-operator-syntax"><a class="header" href="#arbitrary-custom-operator-syntax">Arbitrary custom operator syntax</a></h2>
+<p>Rust allows overloading existing operators; for instance, you can implement the
+<code>Add</code> trait to overload the <code>+</code> operator. However, Rust does not allow creating
+<em>new</em> operators.</p>
+<p>Some would argue this can make code more readable, if you know what the
+operators mean. If you don't, it makes the code inscrutable.</p>
+<p>In general, such a change would substantially raise barriers to entry for Rust
+developers, making Rust code less approachable and less universally
+understandable. We're unlikely to add support for this.</p>
+<p>Note that Rust's existing operator overloading uses semantic trait names (<code>impl Add</code>), rather than symbols or names of symbols (<code>Plus</code> or <code>+</code>), which tends to
+encourage using overloaded operators for the same semantic purposes, rather
+than for building arbitrary domain-specific languages.</p>
+<p>Rust developers seeking to build arbitrary domain-specific languages (DSLs)
+should consider the macro system.</p>
+<h2 id="numeric-overflow-checking-should-be-on-by-default-even-in-release-mode"><a class="header" href="#numeric-overflow-checking-should-be-on-by-default-even-in-release-mode">Numeric overflow checking should be on by default even in release mode</a></h2>
+<p>Whenever possible, Rust tries to do the safe thing by default.</p>
+<p>Numeric overflow checking (e.g. <code>1000u16 * 1000u16</code>) is one case where Rust
+compromised on this: on many targets, numeric overflow checking has high enough
+overhead to hurt performance too much for a wide variety of code. As a result,
+Rust defaults to having overflow checking only for debug builds, while release
+builds have overflow checking off by default. (In release builds, numeric
+overflow wraps, but code cannot count on overflow checking being disabled even
+in release builds, as projects can turn on overflow checking in release builds.
+In addition, library code cannot make any assumptions about overflow checking,
+as the top-level compilation decides whether to enable or disable it.)</p>
+<p>We've thought about this choice many times, and we're open to considering
+changes to this default based on benchmarks. If, on some Rust targets, overflow
+checking adds fairly little overhead on the vast majority of crates, we'd
+consider enabling it by default for those targets.</p>
+<p>It would also help to have ways to detect excessive overhead caused by overflow
+checking (e.g. detecting numeric-heavy code) and suggesting the use of
+explicitly non-overflowing numeric types such as <code>Wrapping</code>.</p>
+<h2 id="cross-function-type-inference"><a class="header" href="#cross-function-type-inference">Cross-function type inference</a></h2>
+<p>Rust's type inference generally stops at function boundaries; Rust requires
+specifying explicit types for function parameters, rather than allowing
+inference to work across functions.</p>
+<p>This is an intentional design choice: by making functions an inference
+boundary, type errors become easier to debug and compartmentalize, and Rust
+developers can reason about code using local reasoning within a function.</p>
+<h2 id="built-in--mandatory-garbage-collection"><a class="header" href="#built-in--mandatory-garbage-collection">Built-in / mandatory garbage collection</a></h2>
+<p>Adding any form of mandatory garbage collection built into the language would
+mandate that all targets support it, which would require some kind of
+&quot;runtime&quot;. Rust gets great benefit from having no required &quot;runtime&quot;. Rust can
+go anywhere, including in systems contexts where relatively few languages can.</p>
+<p>That said, we're happy to add language features to <em>support</em> an <em>optional</em>
+garbage collector, where needed.</p>
+<h2 id="suffix-modifiers-if-after-returnbreakcontinue-or-after-arbitrary-statements"><a class="header" href="#suffix-modifiers-if-after-returnbreakcontinue-or-after-arbitrary-statements">Suffix modifiers (<code>if</code> after <code>return</code>/<code>break</code>/<code>continue</code>, or after arbitrary statements)</a></h2>
+<p>We often get proposals for syntax like <code>return expr if condition;</code> or
+<code>break if condition;</code>. We don't plan to make such a change to Rust.</p>
+<p>Such a change would prioritize <em>concise</em> code over <em>readable</em> code. We don't
+want people to start out thinking they're reading an unconditional <code>return</code>
+statement, and only later see the <code>if</code> and realize it's a conditional return.</p>
+<p>Such a change would also have non-obvious evaluation order (evaluating the
+condition before the return expression).</p>
+<h2 id="size--stride"><a class="header" href="#size--stride">Size != Stride</a></h2>
+<p>Rust assumes that the size of an object is equivalent to the stride of an object -
+this means that the size of <code>[T; N]</code> is <code>N * std::mem::size_of::&lt;T&gt;</code>. Allowing
+size to not equal stride  may allow objects that take up less space in arrays due
+to the reuse of tail padding, and allow interop with other languages with this behavior.</p>
+<p>One downside of this assumption is that types with alignment greater than their size can
+waste large amounts of space due to padding. An overaligned struct such as the following:</p>
+<pre><code>#[repr(C, align(512))] 
+struct Overaligned(u8);
+</code></pre>
+<p>will store only 1 byte of data, but will have 511 bytes of tail padding for a total size of
+512 bytes. This tail padding will not be reusable, and adding <code>Overaligned</code> as a struct field
+may exacerbate this waste as additional trailing padding be included after any other members.</p>
+<p>Rust makes several guarantees that make supporting size != stride difficult in the general case.
+The combination of <code>std::array::from_ref</code> and array indexing is a stable guarantee that a pointer
+(or reference) to a type is convertible to a pointer to a 1-array of that type, and vice versa.</p>
+<p>Such a change could also pose problems for existing unsafe code, which may assume that pointers
+can be manually offset by the size of the type to access the next array element. Unsafe
+code may also assume that overwriting trailing padding is allowed, which would conflict with
+the repurposing of such padding for data storage.</p>
+<p>While changing the fundamental layout guarantees seems unlikely, it may be reasonable to add additional
+inspection APIs for code that wishes to opt into the possibility of copying smaller parts of an object
+-- an API to find out that copying only bytes <code>0..1</code> of <code>Overaligned</code> is sufficient might still be
+reasonable, or something <code>size_of_val</code>-like that could be variant-aware to say which bytes are sufficient
+for copying a particular instance. Similarly, move-only fields may allow users to mitigate the effects
+of tail or internal padding, as they can be reused due to the lack of a possible reference or pointer.</p>
+<p>Cross-referencing to other discussions:</p>
+<ul>
+<li>https://github.com/rust-lang/rfcs/issues/1397</li>
+<li>https://github.com/rust-lang/rust/issues/17027</li>
+<li>https://github.com/rust-lang/unsafe-code-guidelines/issues/176</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="meetings/backlog-bonanza.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="design_notes.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="meetings/backlog-bonanza.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="design_notes.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="mermaid.min.js"></script>
+        <script src="mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

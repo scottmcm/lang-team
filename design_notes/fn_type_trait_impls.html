@@ -1,0 +1,554 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Extending the capabilities of compiler-generated function types - The Rust Language Design Team</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item "><a href="../welcome.html"><strong aria-hidden="true">1.</strong> Welcome</a></li><li class="chapter-item "><a href="../how_to.html"><strong aria-hidden="true">2.</strong> How do I...?</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../how_to/nominate.html"><strong aria-hidden="true">2.1.</strong> Nominate an issue</a></li><li class="chapter-item "><a href="../how_to/design_meeting.html"><strong aria-hidden="true">2.2.</strong> Request a design meeting</a></li><li class="chapter-item "><a href="../how_to/propose.html"><strong aria-hidden="true">2.3.</strong> Propose a change to the language</a></li><li class="chapter-item "><a href="../how_to/new_lint.html"><strong aria-hidden="true">2.4.</strong> Propose or extend a new lint?</a></li><li class="chapter-item "><a href="../how_to/experiment.html"><strong aria-hidden="true">2.5.</strong> Add an experimental feature gate</a></li><li class="chapter-item "><a href="../how_to/stabilize.html"><strong aria-hidden="true">2.6.</strong> Stabilize a feature</a></li></ol></li><li class="chapter-item "><a href="../decision_process.html"><strong aria-hidden="true">3.</strong> Decision process and principles</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../decision_process/examples.html"><strong aria-hidden="true">3.1.</strong> Decision process examples</a></li><li class="chapter-item "><a href="../decision_process/reference.html"><strong aria-hidden="true">3.2.</strong> Decision process reference</a></li></ol></li><li class="chapter-item "><a href="../membership.html"><strong aria-hidden="true">4.</strong> Becoming and being a lang-team member</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../leads.html"><strong aria-hidden="true">4.1.</strong> Lang-team leads</a></li></ol></li><li class="chapter-item "><a href="../chat_platform.html"><strong aria-hidden="true">5.</strong> Chat platform</a></li><li class="chapter-item "><a href="../calendar.html"><strong aria-hidden="true">6.</strong> Calendar</a></li><li class="chapter-item "><a href="../meetings.html"><strong aria-hidden="true">7.</strong> Meetings</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../meetings/triage.html"><strong aria-hidden="true">7.1.</strong> Triage meeting</a></li><li class="chapter-item "><a href="../meetings/design.html"><strong aria-hidden="true">7.2.</strong> Planning and design meetings</a></li><li class="chapter-item "><a href="../meetings/backlog-bonanza.html"><strong aria-hidden="true">7.3.</strong> Backlog bonanza</a></li></ol></li><li class="chapter-item "><a href="../frequently-requested-changes.html"><strong aria-hidden="true">8.</strong> Frequently Requested Changes</a></li><li class="chapter-item expanded "><a href="../design_notes.html"><strong aria-hidden="true">9.</strong> Design notes</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../design_notes/int_literal_as_float.html"><strong aria-hidden="true">9.1.</strong> Allowing integer literals like 1 to be inferred to floating point</a></li><li class="chapter-item "><a href="../design_notes/general_coroutines.html"><strong aria-hidden="true">9.2.</strong> Generalizing coroutines</a></li><li class="chapter-item expanded "><a href="../design_notes/fn_type_trait_impls.html" class="active"><strong aria-hidden="true">9.3.</strong> Extending the capabilities of compiler-generated function types</a></li><li class="chapter-item "><a href="../design_notes/auto_traits.html"><strong aria-hidden="true">9.4.</strong> Auto traits</a></li><li class="chapter-item "><a href="../design_notes/eager_drop.html"><strong aria-hidden="true">9.5.</strong> Eager drop</a></li><li class="chapter-item "><a href="../design_notes/autoref_ops.html"><strong aria-hidden="true">9.6.</strong> Autoderef and autoref in operators</a></li><li class="chapter-item "><a href="../design_notes/copy_ergonomics.html"><strong aria-hidden="true">9.7.</strong> Copy type ergonomics</a></li></ol></li><li class="chapter-item "><a href="../roadmaps.html"><strong aria-hidden="true">10.</strong> Roadmaps</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../roadmaps/roadmap-2024.html"><strong aria-hidden="true">10.1.</strong> Roadmap 2024</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">The Rust Language Design Team</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/rust-lang/lang-team" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/rust-lang/lang-team/edit/master/src/design_notes/fn_type_trait_impls.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="extending-the-capabilities-of-compiler-generated-function-types"><a class="header" href="#extending-the-capabilities-of-compiler-generated-function-types">Extending the capabilities of compiler-generated function types</a></h1>
+<h2 id="background"><a class="header" href="#background">Background</a></h2>
+<p>Both standalone functions and closures have unique compiler-generated types.
+The rest of this document will refer to both categories as simply &quot;function
+types&quot;, and will use the phrase &quot;function types without upvars&quot; to refer to
+standalone functions <em>and</em> closures without upvars.</p>
+<p>Today, these function types have a small set of capabilities, which are
+exposed via trait implementations and implicit conversions.</p>
+<ul>
+<li>
+<p>The <code>Fn</code>, <code>FnMut</code> and <code>FnOnce</code> traits are implemented based on the way
+in which upvars are used.</p>
+</li>
+<li>
+<p><code>Copy</code> and <code>Clone</code> traits are implemented when all upvars implement the
+same trait (trivially true for function types without upvars).</p>
+</li>
+<li>
+<p><code>auto</code> traits are implemented when all upvars implement the same trait.</p>
+</li>
+<li>
+<p>Function types without upvars have an implicit conversion to the
+corresponding <em>function pointer</em> type.</p>
+</li>
+</ul>
+<h2 id="motivation"><a class="header" href="#motivation">Motivation</a></h2>
+<p>There are several cases where it is necessary to write a <a href="https://en.wikipedia.org/wiki/Trampoline_(computing)">trampoline</a>. A trampoline
+is a (usually short) generic function that is used to adapt another function
+in some way.</p>
+<p>Trampolines have the caveat that they must be standalone functions. They cannot
+capture any environment, as it is often necessary to convert them into a
+function pointer.</p>
+<p>Trampolines are most commonly used by compilers themselves. For example, when a
+<code>dyn Trait</code> method is called, the corresponding vtable pointer might refer
+to a trampoline rather than the original method in order to first down-cast
+the <code>self</code> type to a concrete type.</p>
+<p>However, trampolines can also be useful in low-level code that needs to interface
+with C libraries, or even in higher level libraries that can use trampolines in
+order to simplify their public-facing API without incurring a performance
+penalty.</p>
+<p>By expanding the capabilities of compiler-generated function types it would
+be possible to write trampolines using only safe code.</p>
+<h2 id="purpose"><a class="header" href="#purpose">Purpose</a></h2>
+<p>The goal of this design note is describe a range of techniques for implementing
+<em>trampolines</em> (defined below) and some of the feedback regarding those solutions.
+This design note does not intend to favor any specific solutions, just reflect past
+discussions. The presence or absence of any particular feedback in this document
+does not necessarily serve to favor or disfavor any particular solution.</p>
+<h2 id="history"><a class="header" href="#history">History</a></h2>
+<p>Several mechanisms have been proposed to allow trampolines to be written in safe
+code. These have been discussed at length in the following places.</p>
+<p>PR adding <code>Default</code> implementation to function types:</p>
+<ul>
+<li>https://github.com/rust-lang/rust/pull/77688</li>
+</ul>
+<p>Lang team triage meeting discussions:</p>
+<ul>
+<li>https://youtu.be/NDeAH3woda8?t=2224</li>
+<li>https://youtu.be/64_cy5BayLo?t=2028</li>
+<li>https://youtu.be/t3-tF6cRZWw?t=1186</li>
+</ul>
+<h2 id="example"><a class="header" href="#example">Example</a></h2>
+<h3 id="an-adaptor-which-prevents-unwinding-into-c-code"><a class="header" href="#an-adaptor-which-prevents-unwinding-into-c-code">An adaptor which prevents unwinding into C code</a></h3>
+<p>In this example, we are building a crate which provies a safe wrapper around
+an underlying C API. The C API contains at least one function which accepts
+a function pointer to be used as a callback:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>mod c_api {
+    extern {
+        pub fn call_me_back(f: extern &quot;C&quot; fn());
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>We would like to allow users of our crate to safely use their own callbacks.
+The problem is that if the callback panics, we would unwind into C code and this
+would be undefined behaviour.</p>
+<p>To avoid this, we would like to interpose between the user-provided callback and
+the C API, by wrapping it in a call to <code>catch_unwind</code>. Unfortunately, the C API
+offers no way to pass an additional &quot;custom data&quot; field that we could use to
+store the original function pointer.</p>
+<p>Instead, we could write a generic function like this:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use std::{panic, process};
+
+pub fn call_me_back_safely&lt;F: Fn() + Default&gt;(_f: F) {
+    extern &quot;C&quot; fn catch_unwind_wrapper&lt;F: Fn() + Default&gt;() {
+        if panic::catch_unwind(|| {
+            let f = F::default();
+            f()
+        }).is_err() {
+            process::abort();
+        }
+    }
+    unsafe {
+        c_api::call_me_back(catch_unwind_wrapper::&lt;F&gt;);
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>This compiles, and is intended to be used like so:</p>
+<pre><pre class="playground"><code class="language-rust">fn my_callback() {
+    println!(&quot;I was called!&quot;)
+}
+
+fn main() {
+    call_me_back_safely(my_callback);
+}</code></pre></pre>
+<p>However, this will fail to compile with the following error:</p>
+<blockquote>
+<p>error[E0277]: the trait bound <code>fn() {my_callback}: Default</code> is not satisfied</p>
+</blockquote>
+<h2 id="implementing-the-default-trait"><a class="header" href="#implementing-the-default-trait">Implementing the <code>Default</code> trait</a></h2>
+<p>The solution initially proposed was to implement <code>Default</code> for function types
+without upvars. Safe trampolines would be written like so:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn add_one_adapter&lt;F: Fn(i32) + Default&gt;(arg: i32) {
+    let f = F::default();
+    f(arg + 1);
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Discussions of this design had a few central themes.</p>
+<h3 id="when-should-default-be-implemented"><a class="header" href="#when-should-default-be-implemented">When should <code>Default</code> be implemented?</a></h3>
+<p>Unlike <code>Clone</code>, it intuitively does not make sense for a closure to implement
+<code>Default</code> just because its upvars are themselves <code>Default</code>. A closure like
+the following might not expect to ever observe an ID of zero:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn do_thing() -&gt; impl FnOnce() {
+    let id: i32 = generate_id();
+    || {
+      do_something_with_id(id)
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>The closure may have certain pre-conditions on its upvars that are violated
+by code using the <code>Default</code> implementation. That said, if a function type has
+no upvars, then there are no pre-conditions to be violated.</p>
+<p>The general consensus was that if function types are to implement <code>Default</code>,
+it should only be for those without upvars.</p>
+<p>However, this point was also used as an argument against implementing
+<code>Default</code>: traits like <code>Clone</code> are implemented structurally based on the
+upvars, whereas this would be a deviation from that norm.</p>
+<h3 id="leaking-details--weakening-privacy-concerns"><a class="header" href="#leaking-details--weakening-privacy-concerns">Leaking details / weakening privacy concerns</a></h3>
+<p>Anyone who can observe a function type, and can also make use of the <code>Default</code>
+bound, would be able to safely call that function. The concern is that this
+may go against the intention of the function author, who did not explicitly
+opt-in to the <code>Default</code> trait implementation for their function type.</p>
+<p>Points against this argument:</p>
+<ul>
+<li>
+<p>We already leak this kind of capability with the <code>Clone</code> trait implementation.
+A function author may write a <code>FnOnce</code> closure and rely on it only being callable once. However, if the upvars are all <code>Clone</code> then the function itself can be
+cloned and called multiple times.</p>
+</li>
+<li>
+<p>It is difficult to construct practical examples of this happening. The leakage
+happens in the wrong direction (upstream) to be easily exploited whereas we
+usually care about what is public to downstream crates.</p>
+<p>Without specialization, the <code>Default</code> bound would have to be explicitly listed
+which would then be readily visible to consumers of the upstream code.</p>
+</li>
+<li>
+<p>Features like <code>impl Trait</code> make it relatively easy to avoid leaking this
+capability when it's not wanted.</p>
+</li>
+</ul>
+<p>Points for this argument:</p>
+<ul>
+<li>The <code>Clone</code> trait requires an existing instance of the function in order to be
+exploited. The fact that the <code>Default</code> trait gives this capability to types
+directly makes it sufficiently different from <code>Clone</code> to warrant a different
+decision.</li>
+</ul>
+<p>These discussions also raise the question of whether the <code>Clone</code> trait itself
+should be implemented automatically. It is convenient, but it leaves a very
+grey area concerning which traits ought to be implemented for compiler-generated
+types, and the most conservative option would be to require an opt-in for all
+traits beyond the basic <code>Fn</code> traits (in the case of function types).</p>
+<h3 id="unnatural-ness-of-using-default-trait"><a class="header" href="#unnatural-ness-of-using-default-trait">Unnatural-ness of using <code>Default</code> trait</a></h3>
+<p>Several people objected on the grounds that <code>Default</code> was the wrong trait,
+or that the resulting code seemed unnatural or confusing. This lead to
+proposals involving other traits which will be described in their own
+sections.</p>
+<ul>
+<li>
+<p>Some people do not see <code>Default</code> as being equivalent to the
+default-constructible concept from C++, and instead see it as something
+more specialized.</p>
+<p>To avoid putting words in people's mouths I'll quote @Mark-Simulacrum
+directly:</p>
+<blockquote>
+<p>I think the main reason I'm not a fan of adding a Default impl here is
+because you (probably) would never actually use it really as a &quot;default&quot;;
+e.g. Vec::resize'ing with it is super unlikely. It's also not really a
+Default but more just &quot;the only value.&quot; Certainly the error message telling
+me that Default is not implemented for &amp;fn() {foo} is likely to be pretty
+confusing since that does have a natural default too, like any pointer to
+ZST). That's in some sense just more broadly true though.</p>
+</blockquote>
+</li>
+<li>
+<p>There were objections on the grounds that <code>Default</code> is not sufficient to
+guarantee <em>uniqueness</em> of the function value. Code could be written today that
+exposes a public API with a <code>Default + Fn()</code> bound, expecting all types
+meeting that bound to have a single unique value.</p>
+<p>If we expanded the set of types which could implement <code>Default + Fn()</code> (such
+as by stabilizing <code>Fn</code> trait implementations or by making more function
+types implement <code>Default</code>) then the assumptions of such code would be
+broken.</p>
+<p>On the other hand, we really can't stop people from writing faulty code and
+this does not seem like a footgun people are going to accidentally use, in
+part because it's so obscure.</p>
+</li>
+</ul>
+<h3 id="new-lang-item"><a class="header" href="#new-lang-item">New lang-item</a></h3>
+<p>This was a relatively minor consideration, but it is worth noting that this
+solution would require making <code>Default</code> a lang item.</p>
+<h2 id="safe-transmute"><a class="header" href="#safe-transmute">Safe transmute</a></h2>
+<p>This proposal was to materialize the closure using the machinery being
+added with the &quot;safe transmute&quot; RFC to transmute from the unit <code>()</code> type.</p>
+<p>The details of how this would work in practice were not discussed in detail,
+but there were some salient points:</p>
+<ul>
+<li>
+<p>This solves the &quot;uniqueness&quot; problem, in that ZSTs are by definition unique.</p>
+</li>
+<li>
+<p>It does not help with the &quot;privacy leakage&quot; concerns.</p>
+</li>
+<li>
+<p>It opens up a new can of worms relating to the fact that ZST closure types
+may still have upvars.</p>
+</li>
+<li>
+<p>Several people expressed something along the lines of:</p>
+<blockquote>
+<p>if we were going to have a trait that allows this, it might as well be
+Default, because telling people &quot;no, you need the special default&quot; doesn't
+really help anything.</p>
+</blockquote>
+<p>Or, that if it's possible to do this one way with safe code, it should be
+possible to do it in every way that makes sense.</p>
+</li>
+</ul>
+<h2 id="singleton-or-zst-trait"><a class="header" href="#singleton-or-zst-trait"><code>Singleton</code> or <code>ZST</code> trait</a></h2>
+<p>New traits were proposed to avoid using <code>Default</code> to materialize the function
+values. The considerations here are mostly the same as for the &quot;safe
+transmute&quot; propsal. One note is that if we <em>were</em> to add a <code>Singleton</code> trait,
+it would probably make sense for that trait to inherit from the <code>Default</code>
+trait anyway, and so a <code>Default</code> implementation now would be
+backwards-compatible.</p>
+<h2 id="fnstatic-trait"><a class="header" href="#fnstatic-trait"><code>FnStatic</code> trait</a></h2>
+<p>This would be a new addition to the set of <code>Fn</code> traits which would allow
+calling the function without any <code>self</code> argument at all. As the most
+restrictive (for the callee) and least restrictive (for the caller) it
+would sit at the bottom of the <code>Fn</code> trait hierarchy and inherit from <code>Fn</code>.</p>
+<ul>
+<li>Would be easy to understand for users already familiar with the <code>Fn</code> trait hierarchy.</li>
+<li>More unambiguously describes a closure with no upvars rather than one which is a ZST.</li>
+<li>Doesn't solve the problem of accidentally leaking capabilities.</li>
+<li>Does not force a decision on whether closures should implement <code>Default</code>.</li>
+</ul>
+<p>This approach would also generalize the existing closure -&gt; function pointer
+conversion for closures which have no upvars. Instead of being special-cased
+in the compiler, the conversion can apply to all types implementing <code>FnStatic</code>.
+Furthermore, the conversion could be implemented by simply returning a pointer
+to the <code>FnStatic::call_static</code> function, which makes this very elegant.</p>
+<h3 id="example-1"><a class="header" href="#example-1">Example</a></h3>
+<p>With this trait, we can implement <code>call_me_back_safely</code> from the prior example
+like this:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use std::{panic, process};
+
+pub fn call_me_back_safely&lt;F: FnStatic()&gt;(_f: F) {
+    extern &quot;C&quot; fn catch_unwind_wrapper&lt;F: FnStatic()&gt;() {
+        if panic::catch_unwind(F::call_static).is_err() {
+            process::abort();
+        }
+    }
+    unsafe {
+        c_api::call_me_back(catch_unwind_wrapper::&lt;F&gt;);
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="const-eval"><a class="header" href="#const-eval">Const-eval</a></h2>
+<p>Initially proposed by @scalexm, this solution uses the existing implicit
+conversion from function types to function pointers, but in a const-eval
+context:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn add_one_adapter&lt;const F: fn(i32)&gt;(arg: i32) {
+    F(arg + 1);
+}
+
+fn get_adapted_function_ptr&lt;const F: fn(i32)&gt;() -&gt; fn(i32) {
+    add_one_adapter::&lt;F&gt;
+}
+<span class="boring">}</span></code></pre></pre>
+<ul>
+<li>Avoids many of the pitfalls with implementing <code>Default</code>.</li>
+<li>Requires giving up the original function type. There could be cases where
+you still need the original type but the conversion to function pointer
+is irreversible.</li>
+<li>It's not yet clear if const-evaluation will be extended to support this
+use-case.</li>
+<li>Const evaluation has its own complexities, and given that we already have
+unique function types, it seems like the original problem should be solvable
+using the tools we already have available.</li>
+</ul>
+<h2 id="opt-in-trait-implementations"><a class="header" href="#opt-in-trait-implementations">Opt-in trait implementations</a></h2>
+<p>This was barely touched on during the discussions, but one option would be to
+have traits be opted-in via a <code>#[derive(...)]</code>-like attribute on functions and
+closures.</p>
+<ul>
+<li>Gives a lot of power to the user.</li>
+<li>Quite verbose.</li>
+<li>Solves the problem of leaking capabilities.</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../design_notes/general_coroutines.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../design_notes/auto_traits.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../design_notes/general_coroutines.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../design_notes/auto_traits.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

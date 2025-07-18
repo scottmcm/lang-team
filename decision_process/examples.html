@@ -1,0 +1,493 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Decision process examples - The Rust Language Design Team</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item "><a href="../welcome.html"><strong aria-hidden="true">1.</strong> Welcome</a></li><li class="chapter-item "><a href="../how_to.html"><strong aria-hidden="true">2.</strong> How do I...?</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../how_to/nominate.html"><strong aria-hidden="true">2.1.</strong> Nominate an issue</a></li><li class="chapter-item "><a href="../how_to/design_meeting.html"><strong aria-hidden="true">2.2.</strong> Request a design meeting</a></li><li class="chapter-item "><a href="../how_to/propose.html"><strong aria-hidden="true">2.3.</strong> Propose a change to the language</a></li><li class="chapter-item "><a href="../how_to/new_lint.html"><strong aria-hidden="true">2.4.</strong> Propose or extend a new lint?</a></li><li class="chapter-item "><a href="../how_to/experiment.html"><strong aria-hidden="true">2.5.</strong> Add an experimental feature gate</a></li><li class="chapter-item "><a href="../how_to/stabilize.html"><strong aria-hidden="true">2.6.</strong> Stabilize a feature</a></li></ol></li><li class="chapter-item expanded "><a href="../decision_process.html"><strong aria-hidden="true">3.</strong> Decision process and principles</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../decision_process/examples.html" class="active"><strong aria-hidden="true">3.1.</strong> Decision process examples</a></li><li class="chapter-item "><a href="../decision_process/reference.html"><strong aria-hidden="true">3.2.</strong> Decision process reference</a></li></ol></li><li class="chapter-item "><a href="../membership.html"><strong aria-hidden="true">4.</strong> Becoming and being a lang-team member</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../leads.html"><strong aria-hidden="true">4.1.</strong> Lang-team leads</a></li></ol></li><li class="chapter-item "><a href="../chat_platform.html"><strong aria-hidden="true">5.</strong> Chat platform</a></li><li class="chapter-item "><a href="../calendar.html"><strong aria-hidden="true">6.</strong> Calendar</a></li><li class="chapter-item "><a href="../meetings.html"><strong aria-hidden="true">7.</strong> Meetings</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../meetings/triage.html"><strong aria-hidden="true">7.1.</strong> Triage meeting</a></li><li class="chapter-item "><a href="../meetings/design.html"><strong aria-hidden="true">7.2.</strong> Planning and design meetings</a></li><li class="chapter-item "><a href="../meetings/backlog-bonanza.html"><strong aria-hidden="true">7.3.</strong> Backlog bonanza</a></li></ol></li><li class="chapter-item "><a href="../frequently-requested-changes.html"><strong aria-hidden="true">8.</strong> Frequently Requested Changes</a></li><li class="chapter-item "><a href="../design_notes.html"><strong aria-hidden="true">9.</strong> Design notes</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../design_notes/int_literal_as_float.html"><strong aria-hidden="true">9.1.</strong> Allowing integer literals like 1 to be inferred to floating point</a></li><li class="chapter-item "><a href="../design_notes/general_coroutines.html"><strong aria-hidden="true">9.2.</strong> Generalizing coroutines</a></li><li class="chapter-item "><a href="../design_notes/fn_type_trait_impls.html"><strong aria-hidden="true">9.3.</strong> Extending the capabilities of compiler-generated function types</a></li><li class="chapter-item "><a href="../design_notes/auto_traits.html"><strong aria-hidden="true">9.4.</strong> Auto traits</a></li><li class="chapter-item "><a href="../design_notes/eager_drop.html"><strong aria-hidden="true">9.5.</strong> Eager drop</a></li><li class="chapter-item "><a href="../design_notes/autoref_ops.html"><strong aria-hidden="true">9.6.</strong> Autoderef and autoref in operators</a></li><li class="chapter-item "><a href="../design_notes/copy_ergonomics.html"><strong aria-hidden="true">9.7.</strong> Copy type ergonomics</a></li></ol></li><li class="chapter-item "><a href="../roadmaps.html"><strong aria-hidden="true">10.</strong> Roadmaps</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../roadmaps/roadmap-2024.html"><strong aria-hidden="true">10.1.</strong> Roadmap 2024</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">The Rust Language Design Team</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/rust-lang/lang-team" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/rust-lang/lang-team/edit/master/src/decision_process/examples.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="examples-of-the-decision-making-process-in-action"><a class="header" href="#examples-of-the-decision-making-process-in-action">Examples of the decision-making process in action</a></h1>
+<h2 id="reversible-decision-merging-a-proposal"><a class="header" href="#reversible-decision-merging-a-proposal">Reversible decision: merging a proposal</a></h2>
+<p>The process is best described by example. Suppose that there is a pending lang
+team proposal, and a lang team member would like to serve as the liaison. They
+contact the team leads and receive the go-ahead. They can then write:</p>
+<blockquote>
+<p>@rustbot merge</p>
+<p>I propose to merge this proposal. I think it will be a great addition to
+Rust!</p>
+</blockquote>
+<p>This indicates that they would like to merge the proposal. At the moment, there
+is no decision pending, so rustbot would add a comment that looks like the
+following:</p>
+<blockquote>
+<p>Hello! @Alan has proposed to merge this. This is a <strong>reversible decision</strong>,
+which means that it will be affirmed once the &quot;final comment period&quot; of 10
+days have passed, unless a team member places a &quot;hold&quot; on the decision (or
+cancels it).</p>
+<div class="table-wrapper"><table><thead><tr><th>Team member</th><th>State</th></tr></thead><tbody>
+<tr><td>@Alan</td><td><strong>merge</strong></td></tr>
+<tr><td>@Barbara</td><td></td></tr>
+<tr><td>@Grace</td><td></td></tr>
+<tr><td>@Niklaus</td><td></td></tr>
+</tbody></table>
+</div></blockquote>
+<p>As the comment says, the PR is now in &quot;pending decision&quot; state, with Alan
+having kicked off the process with a proposal to merge. Alan's status of
+<strong>merge</strong> will link to his comment.</p>
+<p>Now, for this particular proposal, Barbara has a concern. She thinks that the
+proposal has overlooked an important consideration. She writes a comment:</p>
+<blockquote>
+<p>@rustbot hold</p>
+<p>Did you consider reversing the polarity? Or the impact on the flux capacitor?</p>
+</blockquote>
+<p>At this point, rustbot updates the state; Barbara's status of
+<strong>hold</strong> will link to her comment:</p>
+<blockquote>
+<p>Hello! @Alan has proposed to merge this. This is a <strong>reversible decision</strong>,
+which means that it will be affirmed once the &quot;final comment period&quot; of 10
+days have passed, unless a team member places a &quot;hold&quot; on the decision (or cancels it).</p>
+<div class="table-wrapper"><table><thead><tr><th>Team member</th><th>State</th></tr></thead><tbody>
+<tr><td>@Alan</td><td><strong>merge</strong></td></tr>
+<tr><td>@Barbara</td><td><strong>hold</strong></td></tr>
+<tr><td>@Grace</td><td></td></tr>
+<tr><td>@Niklaus</td><td></td></tr>
+</tbody></table>
+</div></blockquote>
+<p>Alan is currently busy at work, though, so by the time that he and Barbara
+get a chance to talk, 11 days have passed. (Alan and Barbara receive a ping
+from rustbot after a week or so.) Once they get a chance to talk, Alan
+fully addresses Barbara's concern, so Barbara posts:</p>
+<blockquote>
+<p>@rustbot merge</p>
+</blockquote>
+<p>The comment is updated:</p>
+<blockquote>
+<p>Hello! @Alan has proposed to merge this. This is a <strong>reversible decision</strong>,
+which means that it will be affirmed once the &quot;final comment period&quot; of 10
+days have passed, unless a team member places a &quot;hold&quot; on the decision (or cancels it).</p>
+<div class="table-wrapper"><table><thead><tr><th>Team member</th><th>State</th></tr></thead><tbody>
+<tr><td>@Alan</td><td><strong>merge</strong></td></tr>
+<tr><td>@Barbara</td><td><del>hold</del> <strong>merge</strong></td></tr>
+<tr><td>@Grace</td><td></td></tr>
+<tr><td>@Niklaus</td><td></td></tr>
+</tbody></table>
+</div></blockquote>
+<p>Barbara's previous <del>hold</del> status links to her previous comment setting her
+status to <code>hold</code>, and her current <strong>merge</strong> status links to her more recent
+comment setting her status to <code>merge</code>.</p>
+<p>At this point, all the statuses are either empty or <strong>merge</strong>, and more than 10
+days have passed since the FCP started. Therefore, it completes immediately.</p>
+<h2 id="authoring-an-rfc-illustration-of-rustbot-restart"><a class="header" href="#authoring-an-rfc-illustration-of-rustbot-restart">Authoring an RFC (illustration of <code>rustbot restart</code>)</a></h2>
+<p>After some time, the proposal is completed and an RFC is proposed. This is a
+reversible decision. Alan, as the liaison, proposes to merge the RFC with
+<code>@rustbot merge</code>, and the decision making process proceeds as above.</p>
+<p>This time, Niklaus has a concern:</p>
+<blockquote>
+<p>@rustbot hold</p>
+<p>I have not had time to read this yet! Give me a bit of time to write it up.</p>
+</blockquote>
+<p>After 7 days have passed, rustbot writes to him:</p>
+<blockquote>
+<p>@Niklaus, I see you have placed a hold but 7 days have passed. Are you any
+closer to reaching a decision? (cc @Alan)</p>
+</blockquote>
+<p>This continues for a week or two while Alan and Niklaus play &quot;email tag&quot;. In
+the interim, Barbara decides she agrees with the RFC, so she uses <code>@rustbot merge</code> as well. The status now looks like this:</p>
+<blockquote>
+<p>Hello! @Alan has proposed to merge this PR. This is a <strong>reversible
+decision</strong>, which means that it will be affirmed once the &quot;final comment
+period&quot; of 10 days have passed, unless a team member places a &quot;hold&quot; on the decision (or cancels it).
+decision.</p>
+<div class="table-wrapper"><table><thead><tr><th>Team member</th><th>State</th></tr></thead><tbody>
+<tr><td>@Alan</td><td><strong>merge</strong></td></tr>
+<tr><td>@Barbara</td><td><strong>merge</strong></td></tr>
+<tr><td>@Grace</td><td></td></tr>
+<tr><td>@Niklaus</td><td><strong>hold</strong></td></tr>
+</tbody></table>
+</div></blockquote>
+<p>Eventually, Alan and Niklaus find a time to discuss, and Alan agrees that
+Niklaus's concerns are valid, so he makes some major edits to the RFC. Given
+that the RFC is completely different, he decides to restart the clock and
+writes:</p>
+<blockquote>
+<p>@rustbot restart</p>
+</blockquote>
+<p>This strikes through the state of all team members (setting their current
+status to blank, while preserving the history) and begins the clock anew.
+rustbot also pings the relevant team members:</p>
+<blockquote>
+<p>Dear @rust-lang/team, @Alan has restarted the clock!</p>
+</blockquote>
+<p>The status now looks like this:</p>
+<blockquote>
+<p>Hello! @Alan has proposed to merge this. This is a <strong>reversible decision</strong>,
+which means that it will be affirmed once the &quot;final comment period&quot; of 10
+days have passed, unless a team member places a &quot;hold&quot; on the decision (or cancels it).</p>
+<div class="table-wrapper"><table><thead><tr><th>Team member</th><th>State</th></tr></thead><tbody>
+<tr><td>@Alan</td><td><strong>merge</strong></td></tr>
+<tr><td>@Barbara</td><td><del>merge</del></td></tr>
+<tr><td>@Grace</td><td></td></tr>
+<tr><td>@Niklaus</td><td><del>hold</del></td></tr>
+</tbody></table>
+</div></blockquote>
+<p>Barbara can use <code>@rustbot merge</code> to re-affirm her <strong>merge</strong> status, and Niklaus
+can use <code>@rustbot merge</code> to set his own status to <strong>merge</strong> since he agrees
+with the resolution of his concern.</p>
+<h2 id="authoring-an-rfc-continued-overriding-a-concern"><a class="header" href="#authoring-an-rfc-continued-overriding-a-concern">Authoring an RFC continued (Overriding a concern)</a></h2>
+<p>At this point, Grace has a concern, and explains that concern in detail:</p>
+<blockquote>
+<p>@rustbot hold</p>
+<p>I've thought about this a lot, and I don't think we should do this. Now that
+I see the syntax used in practice, I feel like if we do this it'll have an
+adverse effect on the ecosystem...</p>
+</blockquote>
+<p>The status now looks like this:</p>
+<blockquote>
+<p>Hello! @Alan has proposed to merge this. This is a <strong>reversible decision</strong>,
+which means that it will be affirmed once the &quot;final comment period&quot; of 10
+days have passed, unless a team member places a &quot;hold&quot; on the decision (or cancels it).</p>
+<div class="table-wrapper"><table><thead><tr><th>Team member</th><th>State</th></tr></thead><tbody>
+<tr><td>@Alan</td><td><strong>merge</strong></td></tr>
+<tr><td>@Barbara</td><td><del>merge</del> <strong>merge</strong></td></tr>
+<tr><td>@Grace</td><td><strong>hold</strong></td></tr>
+<tr><td>@Niklaus</td><td><del>hold</del> <strong>merge</strong></td></tr>
+</tbody></table>
+</div></blockquote>
+<p>Niklaus reads this message. He feels he understands the concern well, and
+agrees that this point hasn't yet been considered:</p>
+<blockquote>
+<p>@rustbot hold</p>
+<p>I agree. I think we should take more time to evaluate alternative syntaxes.
+What about...</p>
+</blockquote>
+<p>Over the course of a few subsequent meetings and side conversations, Grace and
+other team members discuss the concern further; the initiative owner also
+considers the concern, and raises it with others working on the initiative.</p>
+<p>The owner of the initiative updates the RFC to include a discussion of a couple
+of alternative syntax proposals. The owner recommends a slightly modified
+version of the originally proposed syntax, and outlines criteria that they feel
+the syntax should meet in order to support the use case.</p>
+<p>Grace agrees that her concern has been understood, but does not agree with the
+proposed syntax. Grace feels the new proposal is an improvement, but her
+concern remains.</p>
+<p>Niklaus feels that the team has understood Grace's concern, and furthermore,
+that the updated proposal addresses Grace's concern:</p>
+<blockquote>
+<p>@rustbot merge</p>
+<p>I appreciate the potential impact this may have on the ecosystem. However, I
+feel that as now described in section XYZ of the RFC, the value of A
+outweighs the risk of B, and I think C mitigates the potential risk by...</p>
+</blockquote>
+<p>(Notice that while Niklaus feels that the team has understood Grace's concern,
+he does not speak for the entire team or imply that his summary represents the
+entire team. Niklaus is just withdrawing his own support for the concern.)</p>
+<p>At this point, the entire team other than Grace agrees that the proposal should
+move forward:</p>
+<blockquote>
+<p>Hello! @Alan has proposed to merge this. This is a <strong>reversible decision</strong>,
+which means that it will be affirmed once the &quot;final comment period&quot; of 10
+days have passed, unless a team member places a &quot;hold&quot; on the decision (or cancels it).</p>
+<div class="table-wrapper"><table><thead><tr><th>Team member</th><th>State</th></tr></thead><tbody>
+<tr><td>@Alan</td><td><strong>merge</strong></td></tr>
+<tr><td>@Barbara</td><td><del>merge</del> <strong>merge</strong></td></tr>
+<tr><td>@Grace</td><td><strong>hold</strong></td></tr>
+<tr><td>@Niklaus</td><td><del>hold</del> <del>merge</del> <del>hold</del> <strong>merge</strong></td></tr>
+</tbody></table>
+</div></blockquote>
+<p>(We'll assume, for this example, that Grace does not manage to convince anyone
+else.)</p>
+<p>Grace takes some time, working with the RFC author, to add a dissent, including
+a specific unresolved question.</p>
+<p>Grace then writes a comment containing <code>@rustbot dissent</code>. (If necessary, or if
+Grace would prefer, another team member may issue <code>@rustbot @grace dissent</code> on
+her behalf.) The status now looks like this:</p>
+<blockquote>
+<p>Hello! @Alan has proposed to merge this. This is a <strong>reversible decision</strong>,
+which means that it will be affirmed once the &quot;final comment period&quot; of 10
+days have passed, unless a team member places a &quot;hold&quot; on the decision (or cancels it).</p>
+<div class="table-wrapper"><table><thead><tr><th>Team member</th><th>State</th></tr></thead><tbody>
+<tr><td>@Alan</td><td><strong>merge</strong></td></tr>
+<tr><td>@Barbara</td><td><del>merge</del> <strong>merge</strong></td></tr>
+<tr><td>@Grace</td><td><del>hold</del> <strong>dissent</strong></td></tr>
+<tr><td>@Niklaus</td><td><del>hold</del> <del>merge</del> <del>hold</del> <strong>merge</strong></td></tr>
+</tbody></table>
+</div></blockquote>
+<p>Since all statuses are now either <strong>merge</strong> or <strong>dissent</strong> rustbot also posts a
+comment:</p>
+<blockquote>
+<p>The final comment period has resolved, with a decision to <strong>merge</strong>.</p>
+<p>Note that this decision has dissents; please ensure these dissents have been
+recorded for subsequent consideration.</p>
+</blockquote>
+<h2 id="stabilizing-a-feature"><a class="header" href="#stabilizing-a-feature">Stabilizing a feature</a></h2>
+<p>The feature has been implemented and is now eligible for stabilization. Alan
+writes a stabilization report and posts it, and then issues the command</p>
+<blockquote>
+<p>@rustbot stabilize</p>
+</blockquote>
+<p>Rustbot recognizes that a &quot;stabilization&quot; decision is irreversible, so the
+template is a bit different:</p>
+<blockquote>
+<p>Hello! @Alan has proposed to stabilize this. This is a <strong>irreversible
+decision</strong>, which means that it will be affirmed once all members come to a
+consensus and the &quot;final comment period&quot; of 10 days has passed.</p>
+<div class="table-wrapper"><table><thead><tr><th>Team member</th><th>State</th></tr></thead><tbody>
+<tr><td>@Alan</td><td>stabilize</td></tr>
+<tr><td>@Barbara</td><td></td></tr>
+<tr><td>@Grace</td><td></td></tr>
+<tr><td>@Niklaus</td><td></td></tr>
+</tbody></table>
+</div></blockquote>
+<p>This time, Barbara, Grace, and Niklaus must all explicitly provide a status
+before the decision can proceed. One by one, they join the PR. They must
+individually set their state using one of the rustbot commands.</p>
+<p>Niklaus reads this and comments with <code>@rustbot merge</code>. But then, Niklaus uses
+the feature and discovers a crucial flaw. He posts a comment:</p>
+<blockquote>
+<p>@rustbot close</p>
+<p>After more testing, I believe this is not ready for stabilization. I have
+found that it doesn't work at all like the specification in the case of foo!
+This seems closely related to Grace's concern on the RFC; I think if we
+stabilize at this point we may indeed harm the ecosystem...</p>
+</blockquote>
+<p>Other team members test as well, and find that Niklaus is right. Alan changes
+his status using <code>@rustbot close</code>, and Grace (with some relief) sets the same
+status.</p>
+<p>Once everyone has changed their status, rustbot posts a comment:</p>
+<blockquote>
+<p>The final comment period has resolved, with a decision to <strong>close</strong>.</p>
+</blockquote>
+<p>(Note: Since <code>close</code> is an inherently reversible status (a PR can always be
+reopened), rustbot can observe that everyone has set a reversible status, and
+will start treating the decision as reversible; this means the final comment
+period can end even if Barbara hasn't responded yet.)</p>
+<p>This may not be the end of this feature's consideration, and the concern might
+get resolved in many different ways. The initiative owner might need to do some
+additional design work on how to solve the original use case and address the
+concern; implementers may find a way to address the concern by improving the
+implementation; or the team may change their mind.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../decision_process.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../decision_process/reference.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../decision_process.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../decision_process/reference.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

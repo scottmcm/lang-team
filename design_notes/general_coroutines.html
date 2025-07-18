@@ -1,0 +1,879 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Generalizing coroutines - The Rust Language Design Team</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item "><a href="../welcome.html"><strong aria-hidden="true">1.</strong> Welcome</a></li><li class="chapter-item "><a href="../how_to.html"><strong aria-hidden="true">2.</strong> How do I...?</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../how_to/nominate.html"><strong aria-hidden="true">2.1.</strong> Nominate an issue</a></li><li class="chapter-item "><a href="../how_to/design_meeting.html"><strong aria-hidden="true">2.2.</strong> Request a design meeting</a></li><li class="chapter-item "><a href="../how_to/propose.html"><strong aria-hidden="true">2.3.</strong> Propose a change to the language</a></li><li class="chapter-item "><a href="../how_to/new_lint.html"><strong aria-hidden="true">2.4.</strong> Propose or extend a new lint?</a></li><li class="chapter-item "><a href="../how_to/experiment.html"><strong aria-hidden="true">2.5.</strong> Add an experimental feature gate</a></li><li class="chapter-item "><a href="../how_to/stabilize.html"><strong aria-hidden="true">2.6.</strong> Stabilize a feature</a></li></ol></li><li class="chapter-item "><a href="../decision_process.html"><strong aria-hidden="true">3.</strong> Decision process and principles</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../decision_process/examples.html"><strong aria-hidden="true">3.1.</strong> Decision process examples</a></li><li class="chapter-item "><a href="../decision_process/reference.html"><strong aria-hidden="true">3.2.</strong> Decision process reference</a></li></ol></li><li class="chapter-item "><a href="../membership.html"><strong aria-hidden="true">4.</strong> Becoming and being a lang-team member</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../leads.html"><strong aria-hidden="true">4.1.</strong> Lang-team leads</a></li></ol></li><li class="chapter-item "><a href="../chat_platform.html"><strong aria-hidden="true">5.</strong> Chat platform</a></li><li class="chapter-item "><a href="../calendar.html"><strong aria-hidden="true">6.</strong> Calendar</a></li><li class="chapter-item "><a href="../meetings.html"><strong aria-hidden="true">7.</strong> Meetings</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../meetings/triage.html"><strong aria-hidden="true">7.1.</strong> Triage meeting</a></li><li class="chapter-item "><a href="../meetings/design.html"><strong aria-hidden="true">7.2.</strong> Planning and design meetings</a></li><li class="chapter-item "><a href="../meetings/backlog-bonanza.html"><strong aria-hidden="true">7.3.</strong> Backlog bonanza</a></li></ol></li><li class="chapter-item "><a href="../frequently-requested-changes.html"><strong aria-hidden="true">8.</strong> Frequently Requested Changes</a></li><li class="chapter-item expanded "><a href="../design_notes.html"><strong aria-hidden="true">9.</strong> Design notes</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../design_notes/int_literal_as_float.html"><strong aria-hidden="true">9.1.</strong> Allowing integer literals like 1 to be inferred to floating point</a></li><li class="chapter-item expanded "><a href="../design_notes/general_coroutines.html" class="active"><strong aria-hidden="true">9.2.</strong> Generalizing coroutines</a></li><li class="chapter-item "><a href="../design_notes/fn_type_trait_impls.html"><strong aria-hidden="true">9.3.</strong> Extending the capabilities of compiler-generated function types</a></li><li class="chapter-item "><a href="../design_notes/auto_traits.html"><strong aria-hidden="true">9.4.</strong> Auto traits</a></li><li class="chapter-item "><a href="../design_notes/eager_drop.html"><strong aria-hidden="true">9.5.</strong> Eager drop</a></li><li class="chapter-item "><a href="../design_notes/autoref_ops.html"><strong aria-hidden="true">9.6.</strong> Autoderef and autoref in operators</a></li><li class="chapter-item "><a href="../design_notes/copy_ergonomics.html"><strong aria-hidden="true">9.7.</strong> Copy type ergonomics</a></li></ol></li><li class="chapter-item "><a href="../roadmaps.html"><strong aria-hidden="true">10.</strong> Roadmaps</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../roadmaps/roadmap-2024.html"><strong aria-hidden="true">10.1.</strong> Roadmap 2024</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">The Rust Language Design Team</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/rust-lang/lang-team" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/rust-lang/lang-team/edit/master/src/design_notes/general_coroutines.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="generalized-coroutines"><a class="header" href="#generalized-coroutines">Generalized coroutines</a></h1>
+<p>Since even before Rust 1.0, users have desired the ability to <code>yield</code> like in
+other languages. The compiler infrastructure to achieve this, along with an
+unstable syntax, have existed for a while now. But despite <em>a lot</em> of debate,
+we've failed to polish the feature up enough to stabilize it. I've tried to
+write up a summary of the different design considerations and the past debate
+around them below:</p>
+<h2 id="terminology"><a class="header" href="#terminology">Terminology</a></h2>
+<ul>
+<li>The distinction between a &quot;coroutine&quot; and a &quot;generator&quot; can be a bit vague,
+varying from one discussion to the next.</li>
+<li>In these notes a generator is anything which <em>directly</em> implements <code>Iterator</code>
+or <code>Stream</code> while a coroutine is anything which can take arbitrary input,
+yield arbitrary output, and later resume execution at the previous yield.</li>
+<li>Thus, the &quot;generator&quot; syntax proposed in <a href="https://github.com/rust-lang/rfcs/pull/2033">eRFC-2033</a> and currently
+implemented behind the &quot;generator&quot; feature is actually a coroutine syntax for
+the sake of these notes, <em>not a true generator</em>.
+<ul>
+<li><a href="https://github.com/rust-lang/rfcs/pull/2996/">RFC-2996</a> defines a true generator syntax in &quot;future additions&quot;.</li>
+</ul>
+</li>
+<li>Note also that &quot;coroutines&quot; here are really &quot;semicoroutines&quot; since they can
+only yield back to their caller.</li>
+<li>I will continue to group the <a href="https://github.com/rust-lang/rfcs/pull/2033">original eRFC text</a> and the later <a href="https://github.com/rust-lang/rust/pull/68524">generator
+resume arguments</a> extension
+togther as &quot;<a href="https://github.com/rust-lang/rfcs/pull/2033">eRFC-2033</a>&quot;. That way I only have 3 big proposals to deal
+with.</li>
+<li>In rustc, a coroutine's &quot;witness&quot; is the space where stack-allocated values
+are stored if needed across yields. I'm borrowing this terminology here. Any
+such cross-yield bindings are said to be &quot;witnessed&quot;.</li>
+</ul>
+<pre><code class="language-rust ignore">// This is an example coroutine which might assist a streaming base64 encoder
+|sextet, octets| {
+    let a = sextet; // witness a, b, and c sextets for later use
+    yield;
+    let b = sextet;
+    octets.push(a &lt;&lt; 2 | b &gt;&gt; 4); // aaaaaabb
+    yield;
+    let c = sextet;
+    octets.push((b &amp; 0b1111) &lt;&lt; 4 | c &gt;&gt; 2); // bbbbcccc
+    yield;
+    octets.push((c &amp; 0b11) &lt;&lt; 6 | sextet) // ccdddddd
+}
+
+// This is an example generator which might be used in Iterator::flat_map.
+gen {
+  for item in inner {
+    for mapped in func(item) {
+      yield mapped;
+    }
+  }
+}
+
+// This is an example async generator which might be used in Stream::and_then
+async gen {
+  while let Some(item) = inner.next().await {
+    yield func(item).await;
+  }
+}</code></pre>
+<h2 id="coroutine-trait"><a class="header" href="#coroutine-trait">Coroutine trait</a></h2>
+<ul>
+<li>The coroutine syntax must produce implementations of some trait.</li>
+<li><a href="https://github.com/rust-lang/rfcs/pull/2781">RFC-2781</a> and <a href="https://github.com/rust-lang/rfcs/pull/2033">eRFC-2033</a> propose the <code>Generator</code> trait.</li>
+<li>Note that Rust's coroutines and subroutines look the same from the outside:
+take input, mutate state, produce output.</li>
+<li>Thus, <a href="https://github.com/rust-lang/lang-team/issues/49">MCP-49</a> proposes using the <code>Fn*</code> traits instead, including a new
+<code>FnPin</code> for immovable coroutines.
+<ul>
+<li>Hierarchy: <code>Fn</code> is <code>FnMut + Unpin</code> is <code>FnPin</code> is <code>FnOnce</code>.
+<ul>
+<li>May not be <em>required</em> at the trait level (someone may someday find a use
+to implementing <code>FnMut + !FnPin</code>) but all closures implement the traits in
+this order.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="coroutine-syntax"><a class="header" href="#coroutine-syntax">Coroutine syntax</a></h2>
+<ul>
+<li>The closure syntax is reused for coroutines by <a href="https://github.com/rust-lang/rfcs/pull/2033">eRFC-2033</a>, <a href="https://github.com/rust-lang/rfcs/pull/2781">RFC-2781</a>,
+and <a href="https://github.com/rust-lang/lang-team/issues/49">MCP-49</a>.</li>
+<li>Commentators have suggested that the differences between coroutines and
+closures under <a href="https://github.com/rust-lang/rfcs/pull/2033">eRFC-2033</a> and <a href="https://github.com/rust-lang/rfcs/pull/2781">RFC-2781</a> justify an entirely distinct
+syntax to reduce confusion.</li>
+<li><a href="https://github.com/rust-lang/lang-team/issues/49">MCP-49</a> fully reuses the <em>semantics</em> of closures, greatly simplifying the
+design space and making the shared syntax obvious.</li>
+</ul>
+<h2 id="taking-input"><a class="header" href="#taking-input">Taking input</a></h2>
+<ul>
+<li>The major disagreement between past proposals is whether to use &quot;yield
+expressions&quot; or &quot;magic mutation&quot;.
+<ul>
+<li>Yield expression: <code>let after = yield output;</code>
+<ul>
+<li>Used by <a href="https://github.com/rust-lang/rfcs/pull/2033">eRFC-2033</a></li>
+</ul>
+</li>
+<li>Magic mutation: <code>let before = arg; yield output; let after = arg;</code>
+<ul>
+<li>Used by <a href="https://github.com/rust-lang/rfcs/pull/2781">RFC-2781</a> and <a href="https://github.com/rust-lang/lang-team/issues/49">MCP-49</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Many people have a strong gut preference for yield expressions.
+<ul>
+<li>In simple cases, Rust generally prefers to produce values as output from
+expressions rather than by mutation of state. &quot;Yield expressions <em>feel</em> more
+Rusty.&quot;</li>
+<li>However, magic mutation is likely correct, even though at first glance it
+feels surprising. In addition to reasons below, holding references to past
+resume args is rare, often a logic error. Rust can use mutation checks to
+catch and give feedback.</li>
+</ul>
+</li>
+<li>&quot;Magic mutation&quot; is a bit of a misnomer. The resume argument values are <em>not
+themselves being mutated.</em> The argument bindings are simply being reassigned
+across yields.
+<ul>
+<li>In a sense, argument bindings are reassigned in the exact same way across
+returns.</li>
+<li>Previous arguments (if unmoved) are dropped prior to yielding and are
+reassigned after resuming.</li>
+<li>People will get yelled at by the borrow checker if they try to hold borrows
+of arguments across yields. But the fix is generally easy: move the argument
+to a new binding before yielding.</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-text">=&gt; |x| {
+    let y = &amp;x;
+    yield;
+    dbg!(y, x);
+}
+
+error[E0506]: cannot pass new `x` because it is borrowed
+ --&gt; src/lib.rs:3:4
+  |
+2 |     let y = &amp;x;
+  |             -- borrow of `x` occurs here
+3 |     yield;
+  |     ^^^^^ assignment to borrowed `x` occurs here
+4 |     dbg!(y, x);
+  |             - borrow later used here
+  |
+  = help: consider moving `x` into a new binding before borrowing
+
+=&gt; |x| {
+    let a = x;
+    let y = &amp;a;
+    yield;
+    dbg!(y, x);
+}
+</code></pre>
+<ul>
+<li>Magic mutation could be replaced by &quot;magic shadowing&quot; where new arguments
+shadow old ones at yield in order to allow easy borrowing of past argument
+values. But this is a huge footgun. See if you can spot the issue with the
+following code if <code>ctx</code> shadows its past value rather than overwriting it:</li>
+</ul>
+<pre><code class="language-rust ignore">std::future::from_fn(|ctx| {
+  if is_blocked() {
+    register_waker(ctx);
+    yield Pending;
+  }
+
+  while let Pending = task.poll(ctx) { .. }
+})</code></pre>
+<ul>
+<li>&quot;Yield expression&quot; causes problems with first-resume input.
+<ul>
+<li><a href="https://github.com/rust-lang/rfcs/pull/2033">eRFC-2033</a> passes the first resume argument via a closure parameters
+while later arguments are produced by <code>yield</code> expressions.</li>
+<li>This part of why it is so hard to unify generalized coroutines with a
+generator syntax like <code>gen { }</code> or <code>gen fn</code>. Where does the first input go?
+Where do you annotate the argument type even?</li>
+</ul>
+</li>
+<li>To increase clarity, users almost always want resume arguments to be named.
+<ul>
+<li>With magic mutation, all resume arguments are already named since they reuse
+the closures arguments on every resume. Any unmoved arguments are dropped
+just prior to yielding, so they are not witnessed and do not increase the
+coroutine size.
+<ul>
+<li>Also get multiple arguments for free if using the <code>Fn*</code> traits.</li>
+</ul>
+</li>
+<li>Yield expressions require users to repeatedly assign resume arguments to
+named bindings manually. Such bindings must be included in the closure state
+if they have any drop logic.</li>
+</ul>
+</li>
+</ul>
+<h2 id="borrowed-resume-arguments"><a class="header" href="#borrowed-resume-arguments">Borrowed resume arguments</a></h2>
+<ul>
+<li>What happens when a coroutine witnesses a borrow passed as a resume argument?
+For example:</li>
+</ul>
+<pre><code class="language-rust ignore">let co = |x: &amp;i32| {
+  let mut values = Vec::new();
+  loop {
+    values.push(x);
+    yield;
+  }
+};
+
+// potentially ok:
+let mut x = 0;
+co(&amp;x);
+
+// must not be allowed:
+x = 1;
+co(&amp;x);</code></pre>
+<ul>
+<li>As of writing, <a href="https://github.com/rust-lang/rfcs/pull/2781">RFC-2781</a> leaves this as an unresolved question with a note
+to potentially restrict resume arguments to being <code>'static</code>.</li>
+<li>Since coroutines under <a href="https://github.com/rust-lang/rfcs/pull/2781">MCP-49</a> act as much like closures as possible, and
+treat the witness and capture data the same whenever possible, the example
+above would fail in a similar way to the example below, giving a &quot;borrowed
+data escapes into closure state&quot; error or similar even if <code>x</code> is not mutated.</li>
+</ul>
+<pre><code class="language-rust ignore">let mut values = Vec::new();
+|x: &amp;i32| {
+  loop {
+    values.push(x);
+//  ^^^^^^^^^^^^^^ `x` escapes the closure body here
+    yield;
+  }
+}</code></pre>
+<ul>
+<li>As of writing, <a href="https://github.com/rust-lang/rfcs/pull/2033">eRFC-2033</a> appears to take a similar approach (although the
+error message is not super descriptive).</li>
+<li>Ideally someday we'd do something nicer but any such solution would apply to both captured state and witnessed state in the same way.</li>
+</ul>
+<h2 id="lending"><a class="header" href="#lending">Lending</a></h2>
+<ul>
+<li>Coroutines would eventually like to yield borrows of state to the caller. This
+is &quot;lending&quot; coroutine (sometimes also called an &quot;attached&quot; coroutine).</li>
+<li>Using <a href="https://github.com/rust-lang/lang-team/issues/49">MCP-49</a>, a lending coroutine might look like:</li>
+</ul>
+<pre><code class="language-rust ignore">|| {
+  let mut buffer = Vec::new();
+  loop {
+    let n = fill_buffer(&amp;mut buffer);
+    yield &amp;buffer[..n];
+  }
+}</code></pre>
+<ul>
+<li>None of the major proposals have made an effort to resolve this directly as
+far as I am aware.
+<ul>
+<li><a href="https://github.com/rust-lang/rfcs/pull/2996/">RFC-2996</a> gets the closest with a mention of <code>LendingStream</code> and
+<code>LendingIterator</code> traits in &quot;future additions&quot;.</li>
+<li>We should probably get some experience with lending traits at the lib level
+before attempting to add language level support.</li>
+</ul>
+</li>
+<li>If lending closures were implemented, <a href="https://github.com/rust-lang/lang-team/issues/49">MCP-49</a> could immediately be used to
+build lending streams, iterators, etc so long as the respective traits have
+the needed GAT-ification.</li>
+</ul>
+<h2 id="enum-wrapping"><a class="header" href="#enum-wrapping">Enum-wrapping</a></h2>
+<ul>
+<li><a href="https://github.com/rust-lang/rfcs/pull/2781">RFC-2781</a> and <a href="https://github.com/rust-lang/rfcs/pull/2033">eRFC-2033</a> propose that <code>yield x</code> should produce
+<code>GeneratorState::Yielded(x)</code> or equivalent as an output, in order to
+discriminate between yielded and returned values.</li>
+<li><a href="https://github.com/rust-lang/lang-team/issues/49">MCP-49</a> instead gives <code>yield x</code> and <code>return x</code> nearly identical semantics
+and output <code>x</code> directly, so the two must return the same type.</li>
+<li>Enum-wrapping here is analogous to Ok-wrapping elsewhere. Similar debates
+result.</li>
+<li>When using enum-wrapping, the syntax to specify distinct return/yield types is
+hotly debated.</li>
+<li>Generators always want return and yield to have different types (<code>()</code> vs <code>T</code>)
+but a generator syntax on top of coroutines could be used to auto-insert enum
+wrappers around yield vs return arguments.</li>
+<li>Auto-enum-wrapping can slightly improve type safety in some cases where
+<code>return</code> should be treated specially to avoid bugs.</li>
+<li>No-enum-wrapping when combined with the <code>impl Fn*</code> choice of trait, allow
+the coroutine syntax to be used directly with existing higher-order methods
+on iterator, stream, collection types, async traits, etc.</li>
+<li>Note these two approaches are &quot;isomorphic&quot;: a coroutine that returns
+<code>GeneratorState&lt;T, T&gt;</code> could be wrapped to return <code>T</code> by some sort of
+combinator and a coroutine that only returns <code>T</code> can have <code>yield</code> and <code>return</code>
+values manually wrapped in <code>GeneratorState</code>. This is just about ergonomics:</li>
+</ul>
+<pre><code class="language-rust ignore">// Without enum wrapping:
+std::iter::from_fn(|| {
+  yield Some(1);
+  yield Some(2);
+  yield Some(3);
+  None
+}).map(|x| {
+  yield -x;
+  yield x;
+});
+
+// With enum wrapping:
+std::iter::from_gen_fn(|| {
+  yield 1;
+  yield 2;
+  yield 3;
+}).map(unwrap_gen_state(|x| {
+  yield -x;
+  yield x;
+}));
+
+// Needed for un-enum-wrapping when not desired.
+// Could be replaced by sufficiently fancy !-casting?
+fn unwrap_gen_state&lt;T&gt;(f: impl FnMut() -&gt; GeneratorState&lt;T, !&gt;) -&gt; T { ... }
+fn merge_gen_state&lt;T&gt;(f: impl FnMut() -&gt; GeneratorState&lt;T, T&gt;) -&gt; T { ... }
+
+// With no wrapping + generators:
+(gen {
+  yield 1;
+  yield 2;
+  yield 3;
+}).map(|x| {
+  yield -x;
+  yield x;
+})</code></pre>
+<h2 id="movability"><a class="header" href="#movability">Movability</a></h2>
+<ul>
+<li>All proposals want movability/<code>impl Unpin</code> to be inferred.
+<ul>
+<li>If we forbid &quot;borrowed data escaping into closure state&quot;, the inference
+rules should be relatively simple: witnessing any borrow triggers
+immovability.
+<ul>
+<li>Dead borrows should not be witnessed.</li>
+</ul>
+</li>
+<li>But exact inference rules may only be well understood after an attempt at
+implementation.</li>
+</ul>
+</li>
+<li>Soundness of <code>pin_mut!</code> is a little tricky but seems to be fine no matter what.
+<ul>
+<li>If the resulting mutable borrow is witnessed ⇒ coroutine is <code>!Unpin</code> because
+of inference rules</li>
+<li>If the pinned data is <code>!Unpin</code> and is witnessed ⇒ coroutine is <code>!Unpin</code>
+because witness contains <code>!Unpin</code> data</li>
+<li>Thus, if the coroutine can be moved after resume, any data stack-pinned
+(really witness-pinned) by <code>pin_mut!</code> is not referenced and is <code>Unpin</code>.</li>
+</ul>
+</li>
+<li>Until inference is solved, the <code>static</code> keyword can be used as a modifier.</li>
+</ul>
+<pre><code class="language-rust ignore">// movable via inference
+|| {
+  let x = 4;
+  let y = &amp;x;
+  dbg!(y);
+  yield;
+}
+
+// guaranteed movable (pending inference)
+static || {
+  ...
+}
+
+// immovable
+|| {
+  let x = 4;
+  let y = &amp;x;
+  yield;
+  dbg!(y);
+}</code></pre>
+<h2 id="once-coroutines"><a class="header" href="#once-coroutines">&quot;Once&quot; coroutines</a></h2>
+<ul>
+<li>A lot of coroutines destroy captured data when run.</li>
+<li>These coroutines (notably futures) can be resumed many times but can only be
+run through &quot;once&quot;.</li>
+<li>In contrast to non-yield <code>FnOnce</code> closures, this can not be solved at the type
+level because a coroutine can run out after an arbitrary, runtime-dependent
+number of resumptions.
+<ul>
+<li>Attempts to discriminate with enums tend to run up against <code>Pin</code>.</li>
+</ul>
+</li>
+<li>Coroutines must have the ability to block restart with a <code>panic!</code>.
+<ul>
+<li>Following <code>return</code>.</li>
+<li>Following <code>panic!</code> and recovery.</li>
+<li>The term &quot;poison state&quot; technically refers to only the later case. But here
+I will use it to mean any state at which the closure panics if resumed.</li>
+</ul>
+</li>
+<li><a href="https://github.com/rust-lang/rfcs/pull/2781">RFC-2781</a> and <a href="https://github.com/rust-lang/rfcs/pull/2033">eRFC-2033</a> propose that all coroutines become poisoned
+after returning.</li>
+<li><a href="https://github.com/rust-lang/lang-team/issues/49">MCP-49</a> recommends that all non-capture-destroying coroutines resume at
+their initial state after returning.
+<ul>
+<li>This can be very handy in some situations. In fact, I use it several times
+in examples to increase readability. See anywhere I <code>iter.map(coroutine)</code> or
+the base64 encoder.</li>
+<li>Similar question around generators: should they loop to save on a state or
+should they be fused-by-default?</li>
+<li>If we do decide to panic-after-return, restart-after-return can still be
+emulated using <code>loop { .. }</code> as the coroutine body instead of simply <code>{ .. }</code>. This is even zero-cost because unreachable poison states are eliminated.</li>
+</ul>
+</li>
+<li><a href="https://github.com/rust-lang/lang-team/issues/49">MCP-49</a> also optionally proposes that capture-destroying closures should
+only implement <code>FnOnce</code> unless explicitly annotated, even if they should
+apparently be resumable several times.
+<ul>
+<li><code>mut || { drop(capture); }</code> is recommended as the modifier, to hint that an
+<code>FnMut</code> impl is being requested when the closure in question would otherwise
+impl only <code>FnOnce</code>.</li>
+<li>But the behavior of this modifier is probably too obscure and requires
+too much explanation vs &quot;closures always impl FnMut/FnPin if they contain
+yield&quot;.</li>
+</ul>
+</li>
+</ul>
+<h2 id="async-coroutines"><a class="header" href="#async-coroutines">Async coroutines</a></h2>
+<ul>
+<li>I am aware of no strong proposal for an async version of generalized
+coroutines although a fair amount of discussion has taken place.
+<ul>
+<li>In the context of <a href="https://github.com/rust-lang/lang-team/issues/49">MCP-49</a>, how should <code>async || { ... yield ...}</code> be
+handled in the very long-term? <em>Error right now.</em></li>
+</ul>
+</li>
+<li>Async coroutines don't make much sense because of resume arguments. Async
+functions are already coroutines which take an <code>&amp;mut Context</code> as a resume
+argument. How should additional arguments should be specified?
+<ul>
+<li>Do the additional args need to be passed every single poll or are they only
+needed when resuming after <code>Ready</code>?</li>
+<li>If they are stored between <code>Ready</code>s, how does that interact with the ban on
+witnessing external borrows? Badly.</li>
+<li>On resume, the the coroutine might only take the additional arguments. It
+could then yield a future to take the async context and handle any <code>Pending</code>
+yields.</li>
+<li>If so, how is the coroutine body broken up into distinct futures to be
+yielded?</li>
+<li>What happens if a yielded future is destroyed early? Panic on resume?</li>
+</ul>
+</li>
+<li>Generators and async are both sugars on top of coroutines and are orthogonal
+to each other. But neither is orthogonal to the underlying coroutine feature:</li>
+</ul>
+<pre><code class="language-rust ignore">// an async block
+async {
+  &quot;hello&quot;
+}
+
+// an async generator
+async gen {
+  yield &quot;hello&quot;;
+}
+
+// an &quot;async coroutine&quot;
+|ctx: &amp;mut Context| {
+  yield Poll::Ready(&quot;hello&quot;);
+}</code></pre>
+<ul>
+<li>Taking the async context explicitly makes it cleaner to implement some complex
+async functions which take additional poll parameters.
+<ul>
+<li>An <code>await_with!</code> macro would be quite useful for implementing <code>await</code> loops
+on arbitrary <code>Poll</code>-returning functions.
+<ul>
+<li>Would be a good candidate for an <code>.await(args..)</code> syntax if very heavily
+used.</li>
+</ul>
+</li>
+<li>For example, an simple little checksumming async write wrapper might look
+like this:</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-rust ignore">|ctx: &amp;mut Context, bytes: &amp;[u8]| -&gt; Poll&lt;usize&gt; {
+  let mut checksum = 0;
+  let mut count = 0;
+  pin_mut!(writer);
+
+  loop {
+    let n = 4096 - count;
+    if n == 0 {
+      await_with!(writer.poll_write, ctx, &amp;[checksum]);
+    }
+
+    let part = &amp;bytes[..bytes.len().min(n)];
+    checksum = part.fold(checksum, |x, &amp;y| x ^ y);
+    await_with!(writer.poll_write, ctx, part);
+
+    count += part.len();
+    yield Ready(part.len());
+  }
+}</code></pre>
+<h2 id="try"><a class="header" href="#try">Try</a></h2>
+<ul>
+<li>All proposals work fine with the <code>?</code> operator without even trying (haha).</li>
+<li><code>Poll&lt;Result&lt;_, _&gt;&gt;</code> and <code>Poll&lt;Option&lt;Result&lt;_, _&gt;&gt;&gt;</code> already implement <code>Try</code>!</li>
+<li>Generators usually want a totally different <code>?</code> desugar that does <code>yield Some(Err(...)); return None;</code> instead of <code>return Err(...)</code>.
+<ul>
+<li>This comes up a lot in discussions of general coroutine syntaxes but just
+muddies things up because (say it with me) generators ≠ coroutines.</li>
+<li>Sugar-free implementation is easy: <code>yield Some(try { ... }); None</code></li>
+</ul>
+</li>
+<li>Try blocks in general are super useful for handing errors by moving into
+specific error-handeling states.</li>
+</ul>
+<h2 id="language-similarity"><a class="header" href="#language-similarity">Language similarity</a></h2>
+<ul>
+<li>Rust's version of coroutines can be a bit unusual compared to other languages.
+But the reason for this is simple: you need arguments to resume Rusty
+coroutines.</li>
+<li>Resume arguments in other languages can be passed just fine by sharing mutable
+data. So all they need to implement are generators, not true coroutines as
+defined here.</li>
+</ul>
+<pre><code class="language-python"># Generator function takes a word list and name on construction.
+# The shared list is mutated to make room for new words.
+def write_greeting(name, words):
+    words.append('hello')
+    if words.is_full:
+        yield
+    words.append(name)
+
+</code></pre>
+<pre><code class="language-rust ignore">// Function only needs name to construct coroutine.
+// Coroutine gets mutable access to the word list each resume.
+fn write_greeting(name: String) -&gt; impl FnMut(&amp;mut Vec&lt;String&gt;) {
+  |words| {
+    words.push(&quot;hello&quot;.to_string());
+    if words.len() == words.capacity() {
+      yield
+    }
+    words.push(name);
+  }
+}
+</code></pre>
+<h2 id="language-complexity"><a class="header" href="#language-complexity">Language complexity</a></h2>
+<ul>
+<li>The main selling point of <a href="https://github.com/rust-lang/lang-team/issues/49">MCP-49</a> is that it avoids adding a whole new language feature with associated design questions. Instead, the common answer to questions regarding MCP-49 is that yield-closures simply do whatever closures do.
+<ul>
+<li>The syntax is the same.</li>
+<li>Captures work the same way.</li>
+<li>Arguments are passed the same way.</li>
+<li>Return and yield both drop the latest arguments and then pop the call stack.</li>
+<li>The only big difference is that once <code>yield</code> is involved, some variables get
+stored in a witness struct rather than in the stack frame. Plus the need for
+a poison state.</li>
+</ul>
+</li>
+<li>In fact, <code>return</code> behaves exactly like a simultaneous <code>yield</code> + <code>break 'closure_body</code>.
+<ul>
+<li>In a sense, every closure already has a single yield point at which it
+resumes after <code>return</code>.</li>
+<li>A <code>yield</code> adds a second resume point: hence the need for a discriminant.</li>
+</ul>
+</li>
+<li>Under that proposal, anywhere a closure can be used, a coroutine can too. And
+vice versa.</li>
+</ul>
+<h2 id="generator-unification"><a class="header" href="#generator-unification">Generator unification</a></h2>
+<ul>
+<li>So far in this proposal, I've been very careful to distinguish generators (as
+supported by the propane and async_stream crates, proposed by <a href="https://github.com/rust-lang/rfcs/pull/2996/">RFC-2996</a>,
+etc) from the coroutines discussed here. They are treated as two separate
+language features.</li>
+<li>Does Rust have &quot;room&quot; for both stream syntax and a generator syntax? Would it
+be better to find a single solution to both?</li>
+<li>A single solution is difficult for a few reasons:
+<ul>
+<li>Taking resume arguments muddies the syntax. For example, what would be the
+syntax for a generator function which takes an explicit resume argument?</li>
+<li>The closure syntax works great for coroutines which implement <code>Fn*</code> a la
+<a href="https://github.com/rust-lang/lang-team/issues/49">MCP-49</a>! But reusing that syntax to magically implement <code>Iterator</code> or
+<code>Stream</code> would cause confusion.</li>
+<li>On that note, generators <em>definitely</em> want to implement different traits vs
+coroutines. <code>Iterator</code> and <code>Stream</code> rather than <code>Fn</code> or (ironically)
+<code>Generator</code>.</li>
+<li>As stated above, async coroutines don't make much sense: async interacts
+poorly with resume arguments.</li>
+<li>Async generators are super important, don't care about resume arguments.</li>
+<li>As mentioned in the section on try, generators and coroutines generally want
+different error handling. Or at lest, some more complex <code>?</code> desugar is not
+so obvious for coroutines in general as it is for generators specifically.</li>
+</ul>
+</li>
+<li>Once generalized coroutines are in place, a generator syntax like the one in
+<a href="https://github.com/rust-lang/rfcs/pull/2996/">RFC-2996</a> is a trivial sugar on top:</li>
+</ul>
+<pre><code class="language-rust ignore">gen {
+  for item in inner {
+    for mapped in func(item) {
+      yield mapped;
+    }
+  }
+}
+
+// becomes
+
+std::iter::from_fn(|| {
+  for item in inner {
+    for mapped in func(item) {
+      yield Some(mapped);
+    }
+  }
+  None
+})</code></pre>
+<pre><code class="language-rust ignore">async gen {
+  while let Some(item) = inner.next().await {
+    yield func(item).await;
+  }
+}
+
+// becomes
+
+std::stream::from_fn(|ctx| {
+  while let Some(item) = await_with!(inner.next(), ctx) {
+    yield Ready(Some(await_with!(func(item), ctx)));
+  }
+  Ready(None)
+})</code></pre>
+<ul>
+<li>Proc-macro crates could provide very satisfactory <code>gen</code> and <code>gen_async</code> macros
+until we are sure of the need to support such a sugar directly in language as
+a keyword or in core as a first-party macro.</li>
+</ul>
+<h2 id="past-discussions"><a class="header" href="#past-discussions">Past discussions</a></h2>
+<p>There are a <em>lot</em> of these. Dozens of internals threads, reddit posts, blog
+posts, draft RFCs, pre RFCs, actual RFCs, who knows what in Zulip, and so on.
+So this isn't remotely exhaustive:</p>
+<ul>
+<li>https://github.com/CAD97/rust-rfcs/pull/1</li>
+<li>https://github.com/rust-lang/lang-team/issues/49</li>
+<li>https://github.com/rust-lang/rfcs/pull/2033</li>
+<li>https://github.com/rust-lang/rfcs/pull/2781</li>
+<li>https://github.com/rust-lang/rust/issues/43122</li>
+<li>https://github.com/rust-lang/rust/pull/68524</li>
+<li>https://internals.rust-lang.org/t/crazy-idea-coroutine-closures/1576</li>
+<li>https://internals.rust-lang.org/t/no-return-for-generators/11138</li>
+<li>https://internals.rust-lang.org/t/syntax-for-generators-with-resume-arguments/11456</li>
+<li>https://internals.rust-lang.org/t/trait-generator-vs-trait-fnpin/10411</li>
+<li>https://reddit.com/r/rust/comments/dvd3az/generalizing_coroutines/</li>
+<li>https://samsartor.com/coroutines-2</li>
+<li>https://smallcultfollowing.com/babysteps/blog/2020/03/10/async-interview-7-withoutboats/#async-fn-are-implemented-using-a-more-general-generator-mechanism</li>
+<li>https://users.rust-lang.org/t/coroutines-and-rust/9058</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../design_notes/int_literal_as_float.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../design_notes/fn_type_trait_impls.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../design_notes/int_literal_as_float.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../design_notes/fn_type_trait_impls.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>
