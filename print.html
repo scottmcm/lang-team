@@ -1348,6 +1348,30 @@ of tail or internal padding, as they can be reused due to the lack of a possible
 <li>https://github.com/rust-lang/rust/issues/17027</li>
 <li>https://github.com/rust-lang/unsafe-code-guidelines/issues/176</li>
 </ul>
+<h2 id="implicit-widening"><a class="header" href="#implicit-widening">Implicit Widening</a></h2>
+<p>Often there are requests to no longer need to manually perform lossless numeric conversions,
+such as from <code>f32</code> to <code>f64</code>, from <code>u8</code> to <code>i32</code>, etc.</p>
+<p>While that's convenient in trivial cases, it's not necessarily good in more complex cases.
+If code was perfect then yes it'd be convenient, but Rust would rather ask which thing you
+want between different options when the types don't match.</p>
+<p>Take something like this:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let x: u16 = …;
+let y: u16 = …;
+takes_u32(x + y);
+<span class="boring">}</span></code></pre></pre>
+<p>It would certainly be <em>possible</em> to have that just compile, as though you'd written</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>takes_u32((x+y).into())
+<span class="boring">}</span></code></pre></pre>
+<p>But having an error there is a good opportunity to ask whether perhaps you wanted</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>takes_u32(u32::from(x) + u32::from(y))
+<span class="boring">}</span></code></pre></pre>
+<p>so that it can't overflow in the addition.</p>
 <div style="break-before: page; page-break-before: always;"></div><p>This section contains &quot;notes&quot; about the design of various proposals.
 These are often just links to conversations, along with a few key
 ideas and summaries. Sometimes it includes other information, such as
